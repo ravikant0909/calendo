@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendo Design Decisions</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fff; color: #1a1a1a; line-height: 1.7; max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
+    h1 { font-size: 32px; margin-bottom: 8px; color: #0f172a; }
+    h2 { font-size: 24px; margin-top: 48px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; color: #1e293b; }
+    h3 { font-size: 18px; margin-top: 28px; margin-bottom: 8px; color: #334155; }
+    p { margin-bottom: 16px; }
+    strong { color: #0f172a; }
+    hr { border: none; border-top: 1px solid #e2e8f0; margin: 32px 0; }
+    ul, ol { margin-bottom: 16px; padding-left: 24px; }
+    li { margin-bottom: 6px; }
+    code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 14px; font-family: 'SF Mono', Monaco, Menlo, monospace; }
+    pre { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; overflow-x: auto; margin-bottom: 16px; }
+    pre code { background: none; padding: 0; font-size: 13px; line-height: 1.5; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px; }
+    th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid #e2e8f0; }
+    th { background: #f8fafc; font-weight: 600; color: #475569; font-size: 13px; text-transform: uppercase; letter-spacing: 0.3px; }
+    tr:hover td { background: #fafafa; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+    .badge-decision { background: #dbeafe; color: #1d4ed8; }
+    .badge-rejected { background: #fee2e2; color: #dc2626; }
+    .updated { color: #64748b; font-size: 14px; margin-bottom: 32px; }
+    .nav { position: sticky; top: 0; background: #fff; padding: 12px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 24px; z-index: 10; }
+    .nav a { color: #2563eb; text-decoration: none; font-size: 13px; margin-right: 16px; }
+    .nav a:hover { text-decoration: underline; }
+    #content { /* rendered markdown goes here */ }
+  </style>
+  <!-- pwa-head -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Calendo">
+  <script src="/pwa.js" defer></script>
+</head>
+<body>
+  <div class="nav">
+    <a href="/dashboard/">← Dashboard</a>
+    <a href="#1-core-philosophy">Philosophy</a>
+    <a href="#2-tech-stack">Tech</a>
+    <a href="#3-ai-chat-approach">AI</a>
+    <a href="#4-authentication">Auth</a>
+    <a href="#5-dashboard-design">Dashboard</a>
+    <a href="#7-pricing">Pricing</a>
+  </div>
+  <div id="content"></div>
+
+  <script>
+    // Embedded markdown — works from file:// and deployed
+    const MARKDOWN_CONTENT = `# Calendo Design Decisions
+
+## Document Purpose
+
+This document captures the design decisions for Calendo — what we chose, why, and what we rejected. It serves as a reference for anyone (human or AI) working on the product.
+
+---
+
+## 1. Core Philosophy
+
+### Decision: "Everything free, forever"
+**What**: All features are free. No feature gates. Pro tier ($2/mo) is "support the developer" with minor perks (remove branding, SMS).
+
+**Why**:
+- Calendly charges $10-16/user/month for features that cost us $0.006/user/month to serve
+- The margin exists because software was expensive to build before AI
+- AI collapsed building costs by 100x but prices haven't adjusted
+- Being genuinely free is our marketing — no ads needed
+- "Why is it free?" is a conversation starter, not a red flag
+
+**What we rejected**: Freemium with feature gates (like Calendly). We don't want users hitting artificial walls.
+
+---
+
+## 2. Tech Stack
+
+### Decision: Cloudflare Workers + D1 + Vanilla JS
+**What**: No frameworks (React, Vue, etc). No build step. No origin server. Everything runs at the edge.
+
+**Why**:
+- Cloudflare Workers free tier is absurdly generous (100k requests/day)
+- D1 (SQLite at the edge) has no connection pooling issues
+- Vanilla JS means zero build complexity, any developer can read it
+- No framework churn — React/Next.js versions won't break our code in 2 years
+- AI agents can modify vanilla JS more reliably than framework code
+- Page loads are instant — no 200kb framework bundle
+
+**What we rejected**: Next.js (too complex for a solo dev), Supabase (adds another vendor), Express.js (needs an origin server).
+
+**Trade-off**: Vanilla JS means more manual DOM work. Worth it for simplicity and speed.
+
+---
+
+## 3. AI Chat Approach
+
+### Decision: AI handles conversation, code handles booking
+**What**: The AI chatbot suggests times and answers questions. When the user wants to book, a form appears (name + email + time picker). The actual booking is done by code, not the AI.
+
+**Why**:
+- Small LLMs (Llama 3.1 8B) hallucinate user data — they made up email addresses
+- Even large models (Llama 3.3 70B) sometimes output wrong times
+- Booking requires exact data (email, time) — can't tolerate errors
+- A form with validated inputs is more reliable than AI text extraction
+- Users trust a form for entering their email more than typing it into a chat
+
+**What we rejected**:
+- AI directly creating bookings (tried it — AI hallucinated emails, booked wrong times)
+- AI asking for name/email in conversation then parsing it out (unreliable)
+- No AI at all (loses our key differentiator)
+
+### Decision: Claude Sonnet for quality testing, Llama 3.3 70B for production
+**What**: Use Cloudflare Workers AI (Llama, free) in production. Claude available as option for testing or as a Pro feature.
+
+**Why**:
+- Claude Sonnet costs ~$0.01/chat — unsustainable at scale for a free product
+- Llama 3.3 70B on Cloudflare Workers AI is effectively free
+- Claude responses are notably better, but Llama is "good enough" for this narrow use case
+- The AI's job is simple: look at available slots, suggest times in human language
+
+---
+
+## 4. Authentication
+
+### Decision: Google/Microsoft OAuth for login, separate calendar connect
+**What**: OAuth login only requests basic profile scopes (openid, email, profile). Calendar permissions are requested separately from the dashboard.
+
+**Why**:
+- Requesting calendar scopes during login triggers Google's "unverified app" warning
+- That warning kills conversion — users see "This app hasn't been verified" and leave
+- Separating concerns: login = identity, calendar = integration
+- Users are more willing to grant calendar access after they've already signed in and see the dashboard
+- Calendar connect card on dashboard is persistent and visible
+
+**What we rejected**:
+- Calendar scopes in login flow (scary warning screen for every new user)
+- Skipping OAuth entirely and only doing email/password (fewer users would sign up)
+
+### Decision: Auto-create defaults on registration
+**What**: When a user signs up, automatically create: booking page, availability schedule (Mon-Fri 9-5), and a "30 Minute Meeting" event type.
+
+**Why**:
+- Without defaults, the booking page shows "no meeting types" — useless
+- Users expect the product to work immediately, not require manual setup
+- The booking link should be shareable from minute one
+- Users can customize later from the dashboard
+
+---
+
+## 5. Dashboard Design
+
+### Current State (needs redesign)
+The dashboard has a sidebar with many tabs (Overview, Event Types, Bookings, Analytics, Availability, Routing Forms, Settings, Team, Polls). The Overview tab shows stats + booking link.
+
+### Proposed Redesign
+
+**Principle**: The dashboard should be a single page where you can do everything without clicking through tabs. Meeting types, calendars, and your booking link should all be visible immediately.
+
+**Why this is better**:
+- Everything on one page — no tab-switching
+- Meeting types are front and center (most common action: copy link)
+- Connected calendars visible at all times
+- Upcoming bookings visible without navigating
+- AI bar at bottom for power-user actions
+- Settings, analytics, etc. accessible via AI bar or a secondary menu
+
+**What we keep as secondary pages**:
+- Analytics (dedicated page, linked from AI bar or menu)
+- Team management (separate page)
+- Availability editor (complex UI, opens as modal or separate page)
+- Routing forms (power feature, separate page)
+
+---
+
+## 6. Booking Page Design
+
+### Decision: AI chat inline, not a floating button
+**What**: The AI chat is part of the booking page content (below event types), not a floating widget in the corner.
+
+**Why**:
+- A floating button is easy to miss
+- The AI is our differentiator — it should be prominent, not hidden
+- Inline chat feels like part of the experience, not an add-on
+- Users can see the conversation while also seeing event types above
+
+### Decision: Conversational chat with inline booking form
+**What**: Chat messages stack like a real conversation. When booking is ready, a form appears inline in the chat with time picker + name + email fields.
+
+**Why**:
+- Single static response felt like a dead end — users didn't know how to continue
+- Message bubbles are familiar (every messaging app works this way)
+- Inline form appears at the right moment, not too early
+- Time picker dropdown prevents "wrong time" errors
+
+---
+
+## 7. Pricing
+
+### Decision: Free + $2/mo Pro
+**What**:
+- Free: everything (unlimited event types, team scheduling, AI chat, calendar sync, analytics, webhooks, API)
+- Pro ($2/mo): SMS reminders, remove branding, Claude-powered AI, higher API limits
+
+**Why**:
+- $2/mo is an impulse buy — people don't deliberate over it
+- It's "support the developer" pricing, not "pay for features" pricing
+- Undercuts Calendly by 5-8x
+- Cost to serve each user is ~$0.006/month, so $2/mo is 300x margin
+- No VC investors to return money to — we can price at whatever we want
+
+**What we rejected**:
+- $5/mo (too much for a "support" tier)
+- $8/mo like originally planned (still high for this positioning)
+- Ad-based (looks terrible for a professional scheduling tool)
+- "Cost + 5%" (customers don't care about your costs, they care about theirs)
+
+---
+
+## 8. Open Source
+
+### Decision: AGPL-3.0
+**What**: Code is fully open source. Anyone who deploys a modified version as a service must also open-source their changes.
+
+**Why**:
+- Transparency builds trust ("see exactly how your data is handled")
+- Open source gets free distribution (GitHub stars, HN posts, awesome-lists)
+- AGPL prevents big companies from taking the code and competing without contributing back
+- Self-hosters who try it → some convert to our hosted version
+- At cost-plus pricing, there's no margin for copycats to undercut anyway
+
+**What we rejected**:
+- BSL (Business Source License) — too restrictive, less community goodwill
+- MIT/Apache (too permissive — AWS could clone and compete)
+- Proprietary (no distribution benefit)
+
+---
+
+## Appendix: Cost Model
+
+At 100,000 users (assuming no Claude, no SMS):
+
+| Component | Monthly Cost |
+|-----------|-------------|
+| Cloudflare Workers | ~$25 |
+| Cloudflare D1 | ~$50 |
+| Cloudflare Workers AI (Llama) | ~$100 |
+| Domain | ~$7 |
+| **Total** | **~$182/month** |
+
+Revenue at 2% Pro conversion: 2,000 users × $2/mo = **$4,000/month**
+
+That's a 22x margin. Sustainable.
+
+---
+
+## TODO
+
+- **Booking page AI chatbot**: Decide whether to keep, remove, or redesign the /api/ai/chat endpoint on public booking pages. Currently uses Claude with Llama fallback for conversational booking. Separate decision from the dashboard AI assistant (which uses /api/ai/dashboard).
+`;
+
+    document.getElementById('content').innerHTML = renderMarkdown(MARKDOWN_CONTENT);
+
+    function renderMarkdown(md) {
+      let html = md
+        // Code blocks
+        .replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => `<pre><code>${escapeHtml(code.trim())}</code></pre>`)
+        // Inline code
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        // Headers
+        .replace(/^### (.+)$/gm, (_, t) => `<h3 id="${slugify(t)}">${t}</h3>`)
+        .replace(/^## (\d+\. .+)$/gm, (_, t) => `<h2 id="${slugify(t)}">${t}</h2>`)
+        .replace(/^## (.+)$/gm, (_, t) => `<h2 id="${slugify(t)}">${t}</h2>`)
+        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+        // Bold
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        // Horizontal rules
+        .replace(/^---$/gm, '<hr>')
+        // Tables
+        .replace(/^\|(.+)\|$/gm, (match) => {
+          const cells = match.split('|').filter(c => c.trim());
+          if (cells.every(c => /^[\s-:]+$/.test(c))) return '<!--table-sep-->';
+          return cells.map(c => `<td>${c.trim()}</td>`).join('');
+        })
+        // Lists
+        .replace(/^- \[ \] (.+)$/gm, '<li>☐ $1</li>')
+        .replace(/^- \[x\] (.+)$/gm, '<li>☑ $1</li>')
+        .replace(/^- (.+)$/gm, '<li>$1</li>')
+        // Paragraphs
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/\n/g, '<br>');
+
+      // Wrap in paragraph tags
+      html = '<p>' + html + '</p>';
+      // Clean up empty paragraphs
+      html = html.replace(/<p>\s*<\/p>/g, '');
+      html = html.replace(/<p>\s*(<h[123])/g, '$1');
+      html = html.replace(/(<\/h[123]>)\s*<\/p>/g, '$1');
+      html = html.replace(/<p>\s*<hr>/g, '<hr>');
+      html = html.replace(/<p>\s*<pre>/g, '<pre>');
+      html = html.replace(/<\/pre>\s*<\/p>/g, '</pre>');
+
+      // Wrap table rows
+      html = html.replace(/(<td>.*?<\/td>(<td>.*?<\/td>)*)/g, '<tr>$1</tr>');
+      html = html.replace(/<!--table-sep-->/g, '');
+
+      // Wrap consecutive li elements in ul
+      html = html.replace(/(<li>.*?<\/li>(<br>)?)+/g, (match) => {
+        return '<ul>' + match.replace(/<br>/g, '') + '</ul>';
+      });
+
+      return html;
+    }
+
+    function slugify(text) {
+      return text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/^[\d]+\.\s*/, '');
+    }
+
+    function escapeHtml(text) {
+      return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+  </script>
+</body>
+</html>

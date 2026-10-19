@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - Calendo</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="/apple-touch-icon.png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1a1a1a; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .container { width: 100%; max-width: 400px; padding: 24px; }
+    .logo { text-align: center; margin-bottom: 32px; }
+    .logo a { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: #2563eb; font-size: 28px; font-weight: 700; }
+    .logo img { width: 36px; height: 36px; display: block; }
+    .card { background: #fff; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    h1 { font-size: 24px; margin-bottom: 8px; }
+    .subtitle { color: #64748b; margin-bottom: 24px; font-size: 14px; }
+    .field { margin-bottom: 16px; }
+    label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: #374151; }
+    input[type="text"], input[type="email"], input[type="password"] {
+      width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 15px;
+      outline: none; transition: border-color 0.15s;
+    }
+    input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .btn { width: 100%; padding: 12px; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+    .btn:hover { background: #1d4ed8; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .error { background: #fef2f2; color: #dc2626; padding: 10px 12px; border-radius: 8px; font-size: 14px; margin-bottom: 16px; display: none; }
+    .success { background: #f0fdf4; color: #16a34a; padding: 10px 12px; border-radius: 8px; font-size: 14px; margin-bottom: 16px; display: none; }
+    .footer { text-align: center; margin-top: 20px; font-size: 14px; color: #64748b; }
+    .footer a { color: #2563eb; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+    .hint { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+    .oauth-buttons { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .oauth-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 11px 16px; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; text-decoration: none; border: 1px solid #d1d5db; transition: background 0.15s, box-shadow 0.15s; }
+    .oauth-btn:hover { box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+    .oauth-btn svg { flex-shrink: 0; }
+    .oauth-google { background: #fff; color: #3c4043; }
+    .oauth-google:hover { background: #f8f9fa; }
+    .oauth-microsoft { background: #2f2f2f; color: #fff; border-color: #2f2f2f; }
+    .oauth-microsoft:hover { background: #404040; }
+    .divider { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
+    .divider span { font-size: 13px; color: #94a3b8; text-transform: lowercase; }
+  </style>
+  <!-- pwa-head -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Calendo">
+  <script src="/pwa.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <div class="logo"><a href="/"><img src="/calendo-logo-256.png" alt="">Calendo</a></div>
+    <div class="card">
+      <h1>Create your account</h1>
+      <p class="subtitle">Start scheduling in under a minute</p>
+      <div id="error" class="error"></div>
+      <div class="oauth-buttons">
+        <a href="/api/auth/oauth/google?intent=signup" class="oauth-btn oauth-google">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Sign up with Google
+        </a>
+        <a href="/api/auth/oauth/microsoft?intent=signup" class="oauth-btn oauth-microsoft">
+          <svg width="18" height="18" viewBox="0 0 21 21"><rect x="1" y="1" width="9" height="9" fill="#F25022"/><rect x="11" y="1" width="9" height="9" fill="#7FBA00"/><rect x="1" y="11" width="9" height="9" fill="#00A4EF"/><rect x="11" y="11" width="9" height="9" fill="#FFB900"/></svg>
+          Sign up with Microsoft
+        </a>
+      </div>
+      <div class="divider"><span>or</span></div>
+      <form id="registerForm">
+        <div class="field">
+          <label for="name">Full name</label>
+          <input type="text" id="name" name="name" required autocomplete="name" placeholder="Jane Smith">
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required autocomplete="new-password" placeholder="At least 8 characters" minlength="8">
+          <p class="hint">Must be at least 8 characters</p>
+        </div>
+        <button type="submit" class="btn" id="submitBtn">Create account</button>
+      </form>
+      <div class="footer">
+        <p>Already have an account? <a href="/auth/login.html">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+  <script>
+    const form = document.getElementById('registerForm');
+    const errorEl = document.getElementById('error');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorEl.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating account...';
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          errorEl.textContent = typeof data.error === 'string' ? data.error : (data.error?.message || 'Registration failed');
+          errorEl.style.display = 'block';
+          return;
+        }
+
+        // If the account is already verified (test/auto-confirm), go straight in.
+        if (data.user && data.user.email_verified) {
+          window.location.href = '/dashboard/';
+          return;
+        }
+
+        // Show verification gate instead of redirecting
+        const email = document.getElementById('email').value;
+        document.querySelector('.card').innerHTML = `
+          <div style="text-align:center;padding:20px 0">
+            <div style="display:flex;align-items:center;justify-content:center;gap:10px;font-size:28px;font-weight:700;color:#2563eb;margin-bottom:24px;"><img src="/calendo-logo-256.png" alt="" width="36" height="36" style="display:block;">Calendo</div>
+            <h1 style="font-size:20px;font-weight:700;color:#0f172a;margin-bottom:12px;">Before continuing, we need to verify your email address.</h1>
+            <p style="font-size:15px;color:#0f172a;margin-bottom:4px;">Please check your inbox for a confirmation link.</p>
+            <p style="font-size:15px;color:#64748b;margin-bottom:8px;">If you do not receive the email at <strong>${email}</strong> within an hour, we can <a href="#" id="resendLink" style="color:#2563eb;text-decoration:none;font-weight:500;">resend it to you</a>.</p>
+            <p style="font-size:14px;color:#64748b;margin-top:16px;">If you want to sign up with a different account, <a href="/auth/register.html" style="color:#2563eb;text-decoration:none;font-weight:500;">click here</a>.</p>
+            <div id="resendMsg" style="margin-top:12px;font-size:14px;display:none;"></div>
+          </div>
+        `;
+        document.getElementById('resendLink').addEventListener('click', async (e) => {
+          e.preventDefault();
+          const msgEl = document.getElementById('resendMsg');
+          try {
+            const r = await fetch('/api/auth/resend-verification', { method: 'POST', credentials: 'include' });
+            if (r.ok) { msgEl.style.display = 'block'; msgEl.style.color = '#16a34a'; msgEl.textContent = 'Verification email resent! Check your inbox.'; }
+            else { msgEl.style.display = 'block'; msgEl.style.color = '#dc2626'; msgEl.textContent = 'Failed to resend. Please try again.'; }
+          } catch { msgEl.style.display = 'block'; msgEl.style.color = '#dc2626'; msgEl.textContent = 'Network error. Please try again.'; }
+        });
+      } catch (err) {
+        errorEl.textContent = 'Network error. Please try again.';
+        errorEl.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create account';
+      }
+    });
+
+    // Hide OAuth buttons if not configured
+    fetch('/api/config').then(r => r.json()).then(config => {
+      const oauthSection = document.querySelector('.oauth-buttons');
+      const divider = document.querySelector('.divider');
+      if (!config.oauth?.google && !config.oauth?.microsoft) {
+        if (oauthSection) oauthSection.style.display = 'none';
+        if (divider) divider.style.display = 'none';
+      } else {
+        if (!config.oauth?.google) {
+          const btn = document.querySelector('.oauth-google');
+          if (btn) btn.style.display = 'none';
+        }
+        if (!config.oauth?.microsoft) {
+          const btn = document.querySelector('.oauth-microsoft');
+          if (btn) btn.style.display = 'none';
+        }
+      }
+    }).catch(() => {});
+  </script>
+</body>
+</html>

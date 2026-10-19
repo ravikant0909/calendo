@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reschedule Booking | Calendo</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --brand: #0069ff;
+      --brand-light: #e8f0fe;
+      --text: #1a1a1a;
+      --text-secondary: #555;
+      --text-muted: #888;
+      --border: #e0e0e0;
+      --bg: #ffffff;
+      --bg-page: #f7f8fa;
+      --bg-hover: #f5f5f5;
+      --success: #00a854;
+      --error: #e53e3e;
+      --error-light: #fff5f5;
+      --warning: #dd6b20;
+      --radius: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-lg: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-page);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .logo a {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--brand);
+      text-decoration: none;
+    }
+
+    .card {
+      background: var(--bg);
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      text-align: center;
+      padding: 24px 24px 0;
+    }
+
+    /* Current booking details strip */
+    .current-booking {
+      background: var(--bg-page);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      margin: 16px 24px 0;
+      border-radius: var(--radius);
+    }
+
+    .current-booking-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .current-booking-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .current-detail {
+      font-size: 14px;
+    }
+
+    .current-detail-label {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .current-detail-value {
+      font-weight: 500;
+    }
+
+    /* Calendar layout */
+    .scheduler {
+      display: flex;
+      min-height: 440px;
+    }
+
+    .calendar-panel {
+      flex: 1;
+      padding: 24px;
+      min-width: 0;
+    }
+
+    .calendar-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .calendar-nav-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      width: 36px;
+      height: 36px;
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+    }
+
+    .calendar-nav-btn:hover { background: var(--bg-hover); }
+    .calendar-nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+    .calendar-month {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .calendar-weekday {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 6px 0;
+      font-weight: 500;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      border-radius: 50%;
+      color: var(--text-muted);
+      max-width: 44px;
+      max-height: 44px;
+      margin: 0 auto;
+    }
+
+    .calendar-day.available {
+      color: var(--text);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .calendar-day.available:hover {
+      background: var(--brand-light);
+    }
+
+    .calendar-day.selected {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    .calendar-day.today {
+      border: 2px solid var(--brand);
+    }
+
+    .calendar-day.other-month {
+      visibility: hidden;
+    }
+
+    /* Time slots panel */
+    .time-slots-panel {
+      width: 220px;
+      flex-shrink: 0;
+      border-left: 1px solid var(--border);
+      padding: 24px 16px;
+      overflow-y: auto;
+      max-height: 440px;
+    }
+
+    .time-slots-date {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    .time-slot {
+      display: block;
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      border: 1px solid var(--brand);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--brand);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      font-family: inherit;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .time-slot:hover {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    .time-slots-empty {
+      color: var(--text-muted);
+      font-size: 14px;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    /* Confirm panel */
+    .confirm-panel {
+      padding: 24px;
+    }
+
+    .confirm-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .confirm-summary {
+      background: var(--bg-page);
+      padding: 16px;
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .confirm-summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+    }
+
+    .confirm-summary-label {
+      color: var(--text-muted);
+    }
+
+    .confirm-summary-value {
+      font-weight: 500;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 32px;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 0.15s;
+    }
+
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-back {
+      padding: 12px 16px;
+      background: none;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 15px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-back:hover { background: var(--bg-hover); }
+
+    .btn-link {
+      background: none;
+      border: none;
+      color: var(--brand);
+      font-size: 14px;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 8px;
+      text-decoration: none;
+      display: block;
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    .btn-link:hover { text-decoration: underline; }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .status-message {
+      padding: 16px;
+      border-radius: var(--radius);
+      margin: 20px 24px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .status-success { background: #f0fff4; color: var(--success); border: 1px solid #c6f6d5; }
+    .status-error { background: var(--error-light); color: var(--error); border: 1px solid #fed7d7; }
+    .status-warning { background: #fffaf0; color: var(--warning); border: 1px solid #feebc8; }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--brand);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hidden { display: none; }
+
+    .calendar-error {
+      padding: 12px;
+      background: var(--error-light);
+      color: var(--error);
+      border-radius: var(--radius);
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    /* Confirmation view */
+    .confirmation-view {
+      text-align: center;
+      padding: 40px 24px;
+    }
+
+    .animated-check-container {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 20px;
+    }
+
+    .animated-check-circle {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--success);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: check-scale 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+
+    @keyframes check-scale {
+      0% { transform: scale(0); opacity: 0; }
+      60% { transform: scale(1.1); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .animated-check-circle svg {
+      width: 36px;
+      height: 36px;
+    }
+
+    .animated-check-circle svg path {
+      stroke: #fff;
+      stroke-width: 3;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 50;
+      stroke-dashoffset: 50;
+      animation: check-draw 0.5s 0.3s forwards;
+    }
+
+    @keyframes check-draw {
+      to { stroke-dashoffset: 0; }
+    }
+
+    .confirmation-title {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .confirmation-subtitle {
+      color: var(--text-secondary);
+      font-size: 15px;
+      margin-bottom: 24px;
+    }
+
+    .confirmation-details {
+      background: var(--bg-page);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: inline-block;
+      text-align: left;
+      min-width: 300px;
+    }
+
+    .confirmation-detail-row {
+      display: flex;
+      gap: 12px;
+      padding: 8px 0;
+      font-size: 14px;
+    }
+
+    .confirmation-detail-label {
+      color: var(--text-muted);
+      min-width: 80px;
+    }
+
+    .confirmation-detail-value {
+      font-weight: 500;
+    }
+
+    /* Add-to-Calendar Buttons */
+    .calendar-links {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .cal-link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      font-family: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .cal-link-btn:hover {
+      border-color: #0069ff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .cal-link-btn svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 640px) {
+      .container { padding: 20px 12px; }
+      .scheduler { flex-direction: column; }
+      .time-slots-panel {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid var(--border);
+        max-height: none;
+      }
+      .current-booking-details { flex-direction: column; gap: 8px; }
+      .confirm-summary-row { flex-direction: column; gap: 2px; }
+      .calendar-links { flex-direction: column; align-items: center; }
+      .cal-link-btn { width: 100%; max-width: 280px; justify-content: center; }
+      .confirmation-details { min-width: auto; width: 100%; }
+    }
+  </style>
+  <!-- pwa-head -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Calendo">
+  <script src="/pwa.js" defer></script>
+</head>
+<body>
+
+<div class="container">
+  <div class="logo"><a href="/">Calendo</a></div>
+
+  <div class="card">
+    <!-- Loading state -->
+    <div id="loading">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Loading booking details...</p>
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div id="error-state" class="hidden">
+      <div class="status-message status-error" id="error-message"></div>
+    </div>
+
+    <!-- Already cancelled/rescheduled -->
+    <div id="already-state" class="hidden">
+      <div class="status-message status-warning" id="already-message"></div>
+    </div>
+
+    <!-- Main reschedule UI -->
+    <div id="reschedule-ui" class="hidden">
+      <h1>Reschedule Booking</h1>
+
+      <div class="current-booking" id="current-booking-info">
+        <div class="current-booking-title">Current booking</div>
+        <div class="current-booking-details">
+          <div class="current-detail">
+            <div class="current-detail-label">Event</div>
+            <div class="current-detail-value" id="current-event"></div>
+          </div>
+          <div class="current-detail">
+            <div class="current-detail-label">Date & Time</div>
+            <div class="current-detail-value" id="current-datetime"></div>
+          </div>
+          <div class="current-detail">
+            <div class="current-detail-label">Host</div>
+            <div class="current-detail-value" id="current-host"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calendar view -->
+      <div id="calendar-view">
+        <div style="padding: 16px 24px 0; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <select id="timezone-select" style="flex: 1; border: 1px solid var(--border); border-radius: 4px; padding: 6px 8px; font-size: 13px; font-family: inherit; color: var(--text); background: var(--bg); cursor: pointer;"></select>
+        </div>
+        <div class="scheduler">
+          <div class="calendar-panel">
+            <div class="calendar-error hidden" id="calendar-error"></div>
+            <div id="calendar"></div>
+          </div>
+          <div class="time-slots-panel hidden" id="time-slots-panel">
+            <div class="time-slots-date" id="time-slots-date"></div>
+            <div id="time-slots-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirm view -->
+      <div id="confirm-view" class="hidden">
+        <div class="confirm-panel">
+          <div class="confirm-title">Confirm New Time</div>
+          <div class="confirm-summary">
+            <div class="confirm-summary-row">
+              <span class="confirm-summary-label">Event</span>
+              <span class="confirm-summary-value" id="confirm-event"></span>
+            </div>
+            <div class="confirm-summary-row">
+              <span class="confirm-summary-label">New Time</span>
+              <span class="confirm-summary-value" id="confirm-datetime"></span>
+            </div>
+            <div class="confirm-summary-row">
+              <span class="confirm-summary-label">Host</span>
+              <span class="confirm-summary-value" id="confirm-host"></span>
+            </div>
+          </div>
+          <div class="calendar-error hidden" id="confirm-error"></div>
+          <div class="form-actions">
+            <button class="btn-back" id="btn-back-calendar">Back</button>
+            <button class="btn-primary" id="btn-reschedule">Confirm Reschedule</button>
+          </div>
+        </div>
+      </div>
+
+      <a class="btn-link" id="cancel-link" href="#">Cancel this booking instead</a>
+    </div>
+
+    <!-- Success confirmation -->
+    <div id="success-state" class="hidden">
+      <div class="confirmation-view">
+        <div class="animated-check-container">
+          <div class="animated-check-circle">
+            <svg viewBox="0 0 40 40"><path d="M10 20 L17 27 L30 14" /></svg>
+          </div>
+        </div>
+        <div class="confirmation-title">Booking Rescheduled</div>
+        <div class="confirmation-subtitle">Your booking has been moved to the new time.</div>
+        <div class="confirmation-details" id="confirmation-details"></div>
+        <div class="calendar-links" id="calendar-links"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+
+  // ====================================
+  // Add-to-Calendar Helper
+  // ====================================
+  function generateCalendarLinks(title, description, location, startISO, endISO) {
+    const links = {};
+    const googleStart = startISO.replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    const googleEnd = endISO.replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+
+    links.google = 'https://calendar.google.com/calendar/r/eventedit?' + new URLSearchParams({
+      text: title,
+      dates: googleStart + '/' + googleEnd,
+      details: description,
+      location: location,
+    }).toString();
+
+    links.outlook = 'https://outlook.live.com/calendar/0/deeplink/compose?' + new URLSearchParams({
+      subject: title,
+      startdt: startISO,
+      enddt: endISO,
+      body: description,
+      location: location,
+    }).toString();
+
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Calendo//EN',
+      'BEGIN:VEVENT',
+      'DTSTART:' + googleStart,
+      'DTEND:' + googleEnd,
+      'SUMMARY:' + icsEscapeStr(title),
+      'DESCRIPTION:' + icsEscapeStr(description),
+      'LOCATION:' + icsEscapeStr(location),
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    links.icsUrl = URL.createObjectURL(blob);
+    return links;
+  }
+
+  function icsEscapeStr(str) {
+    return (str || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+  }
+
+  function renderCalendarLinkButtons(containerId, title, description, location, startISO, endISO) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const links = generateCalendarLinks(title, description, location, startISO, endISO);
+    container.innerHTML = `
+      <a class="cal-link-btn" href="${escapeHtml(links.google)}" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#4285F4" stroke-width="2"/><path d="M3 10h18" stroke="#4285F4" stroke-width="2"/><path d="M8 2v4M16 2v4" stroke="#4285F4" stroke-width="2" stroke-linecap="round"/><path d="M8 14l2 2 4-4" stroke="#34A853" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Google Calendar
+      </a>
+      <a class="cal-link-btn" href="${escapeHtml(links.outlook)}" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#0078D4" stroke-width="2"/><path d="M3 10h18" stroke="#0078D4" stroke-width="2"/><path d="M8 2v4M16 2v4" stroke="#0078D4" stroke-width="2" stroke-linecap="round"/><rect x="7" y="13" width="4" height="3" rx="0.5" fill="#0078D4"/></svg>
+        Outlook
+      </a>
+      <a class="cal-link-btn" href="${escapeHtml(links.icsUrl)}" download="booking.ics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download .ics
+      </a>
+    `;
+  }
+
+  const state = {
+    booking: null,
+    currentMonth: { year: new Date().getFullYear(), month: new Date().getMonth() },
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    slots: {},
+    selectedDate: null,
+    selectedTime: null,
+  };
+
+  async function init() {
+    if (!token) {
+      showError('No booking token provided. Please use the link from your confirmation email.');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/bookings/by-token/' + encodeURIComponent(token));
+      const data = await res.json();
+
+      if (!res.ok) {
+        showError(data.error || 'Could not load booking details.');
+        return;
+      }
+
+      state.booking = data;
+      state.timezone = data.invitee_timezone || state.timezone;
+
+      // Check status
+      if (data.status === 'cancelled') {
+        showAlready('This booking has been cancelled and cannot be rescheduled.');
+        return;
+      }
+      if (data.status === 'rescheduled') {
+        showAlready('This booking has already been rescheduled. Please use the updated booking link.');
+        return;
+      }
+
+      // Check if in the past - parse as UTC
+      const rawStart = data.start_time.includes('T') ? data.start_time : data.start_time.replace(' ', 'T') + 'Z';
+      const startTime = new Date(rawStart);
+      if (startTime <= new Date()) {
+        showAlready('This booking has already passed and cannot be rescheduled.');
+        return;
+      }
+
+      // Set up UI
+      document.getElementById('current-event').textContent = data.event_type_name;
+      document.getElementById('current-host').textContent = data.host_name;
+
+      const tz = state.timezone;
+      const dateStr = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      }).format(startTime);
+      document.getElementById('current-datetime').textContent = dateStr;
+
+      document.getElementById('cancel-link').href = '/booking/cancel.html?token=' + encodeURIComponent(token);
+
+      initTimezoneSelector();
+
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('reschedule-ui').classList.remove('hidden');
+
+      await fetchAvailability();
+      renderCalendar();
+    } catch (err) {
+      showError('Failed to load booking details. Please try again.');
+    }
+  }
+
+  function initTimezoneSelector() {
+    const select = document.getElementById('timezone-select');
+    select.innerHTML = '';
+
+    const commonTimezones = [
+      'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles',
+      'America/Anchorage', 'Pacific/Honolulu', 'America/Toronto', 'America/Vancouver',
+      'America/Sao_Paulo', 'America/Argentina/Buenos_Aires', 'America/Mexico_City',
+      'Europe/London', 'Europe/Paris', 'Europe/Berlin', 'Europe/Madrid', 'Europe/Rome',
+      'Europe/Amsterdam', 'Europe/Moscow', 'Europe/Istanbul',
+      'Asia/Dubai', 'Asia/Kolkata', 'Asia/Shanghai', 'Asia/Tokyo', 'Asia/Seoul',
+      'Asia/Singapore', 'Asia/Hong_Kong', 'Asia/Bangkok',
+      'Australia/Sydney', 'Australia/Melbourne', 'Pacific/Auckland',
+      'Africa/Cairo', 'Africa/Lagos', 'Africa/Johannesburg',
+      'UTC',
+    ];
+
+    if (!commonTimezones.includes(state.timezone)) {
+      commonTimezones.unshift(state.timezone);
+    }
+
+    for (const tz of commonTimezones) {
+      const opt = document.createElement('option');
+      opt.value = tz;
+      opt.textContent = tz.replace(/_/g, ' ');
+      if (tz === state.timezone) opt.selected = true;
+      select.appendChild(opt);
+    }
+
+    select.onchange = async () => {
+      state.timezone = select.value;
+      state.selectedDate = null;
+      state.selectedTime = null;
+      hideTimeSlots();
+      await fetchAvailability();
+      renderCalendar();
+    };
+  }
+
+  async function fetchAvailability() {
+    const { booking, currentMonth, timezone } = state;
+    if (!booking) return;
+
+    if (!booking.booking_page_slug || !booking.event_type_slug) {
+      const errorEl = document.getElementById('calendar-error');
+      errorEl.textContent = 'Unable to load availability. Booking page information is missing.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+
+    const year = currentMonth.year;
+    const month = currentMonth.month;
+    const start = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    const end = `${year}-${String(month + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+
+    const errorEl = document.getElementById('calendar-error');
+    errorEl.classList.add('hidden');
+
+    try {
+      const res = await fetch(
+        `/api/availability/${encodeURIComponent(booking.booking_page_slug)}/${encodeURIComponent(booking.event_type_slug)}?start=${start}&end=${end}&timezone=${encodeURIComponent(timezone)}`
+      );
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        errorEl.textContent = body.error || 'Failed to load availability.';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+      const data = await res.json();
+      state.slots = data.slots || {};
+    } catch (err) {
+      errorEl.textContent = 'Failed to load availability. Please try again.';
+      errorEl.classList.remove('hidden');
+    }
+  }
+
+  function renderCalendar() {
+    const { currentMonth, slots, selectedDate } = state;
+    const year = currentMonth.year;
+    const month = currentMonth.month;
+
+    const calendarEl = document.getElementById('calendar');
+    calendarEl.innerHTML = '';
+
+    // Navigation
+    const nav = document.createElement('div');
+    nav.className = 'calendar-nav';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'calendar-nav-btn';
+    prevBtn.innerHTML = '&larr;';
+    const now = new Date();
+    prevBtn.disabled = (year === now.getFullYear() && month <= now.getMonth());
+    prevBtn.onclick = async () => {
+      state.currentMonth.month--;
+      if (state.currentMonth.month < 0) {
+        state.currentMonth.month = 11;
+        state.currentMonth.year--;
+      }
+      state.selectedDate = null;
+      hideTimeSlots();
+      await fetchAvailability();
+      renderCalendar();
+    };
+
+    const monthLabel = document.createElement('div');
+    monthLabel.className = 'calendar-month';
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                         'July', 'August', 'September', 'October', 'November', 'December'];
+    monthLabel.textContent = `${monthNames[month]} ${year}`;
+
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'calendar-nav-btn';
+    nextBtn.innerHTML = '&rarr;';
+    nextBtn.onclick = async () => {
+      state.currentMonth.month++;
+      if (state.currentMonth.month > 11) {
+        state.currentMonth.month = 0;
+        state.currentMonth.year++;
+      }
+      state.selectedDate = null;
+      hideTimeSlots();
+      await fetchAvailability();
+      renderCalendar();
+    };
+
+    nav.appendChild(prevBtn);
+    nav.appendChild(monthLabel);
+    nav.appendChild(nextBtn);
+    calendarEl.appendChild(nav);
+
+    // Grid
+    const grid = document.createElement('div');
+    grid.className = 'calendar-grid';
+
+    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    for (const wd of weekdays) {
+      const cell = document.createElement('div');
+      cell.className = 'calendar-weekday';
+      cell.textContent = wd;
+      grid.appendChild(cell);
+    }
+
+    const firstDayOfMonth = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const todayStr = formatLocalDate(now);
+
+    for (let i = 0; i < firstDayOfMonth; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'calendar-day other-month';
+      grid.appendChild(cell);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const cell = document.createElement('div');
+      cell.className = 'calendar-day';
+      cell.textContent = day;
+
+      const hasSlots = slots[dateStr] && slots[dateStr].length > 0;
+      if (hasSlots) {
+        cell.classList.add('available');
+        cell.onclick = () => selectDate(dateStr);
+      }
+
+      if (dateStr === todayStr) cell.classList.add('today');
+      if (dateStr === selectedDate) cell.classList.add('selected');
+
+      grid.appendChild(cell);
+    }
+
+    calendarEl.appendChild(grid);
+  }
+
+  function selectDate(dateStr) {
+    state.selectedDate = dateStr;
+    state.selectedTime = null;
+    renderCalendar();
+    renderTimeSlots(dateStr);
+  }
+
+  function renderTimeSlots(dateStr) {
+    const panel = document.getElementById('time-slots-panel');
+    const list = document.getElementById('time-slots-list');
+    const dateLabel = document.getElementById('time-slots-date');
+
+    panel.classList.remove('hidden');
+
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const dateObj = new Date(y, m - 1, d);
+    const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+    const monthName = dateObj.toLocaleDateString('en-US', { month: 'long' });
+    dateLabel.textContent = `${weekday}, ${monthName} ${d}`;
+
+    const slotsForDay = state.slots[dateStr] || [];
+    list.innerHTML = '';
+
+    if (slotsForDay.length === 0) {
+      list.innerHTML = '<div class="time-slots-empty">No available times</div>';
+      return;
+    }
+
+    for (const time of slotsForDay) {
+      const btn = document.createElement('button');
+      btn.className = 'time-slot';
+      btn.textContent = formatTime12h(time);
+      btn.onclick = () => selectTime(dateStr, time);
+      list.appendChild(btn);
+    }
+  }
+
+  function hideTimeSlots() {
+    document.getElementById('time-slots-panel').classList.add('hidden');
+  }
+
+  function selectTime(dateStr, time) {
+    state.selectedTime = time;
+
+    document.getElementById('calendar-view').classList.add('hidden');
+    document.getElementById('confirm-view').classList.remove('hidden');
+
+    const { booking } = state;
+    const duration = booking.duration_minutes;
+    const endTime = addMinutes(time, duration);
+
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const dateObj = new Date(y, m - 1, d);
+    const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+    const monthName = dateObj.toLocaleDateString('en-US', { month: 'long' });
+
+    document.getElementById('confirm-event').textContent = booking.event_type_name;
+    document.getElementById('confirm-host').textContent = booking.host_name;
+    document.getElementById('confirm-datetime').textContent =
+      `${formatTime12h(time)} - ${formatTime12h(endTime)}, ${weekday}, ${monthName} ${d}, ${y}`;
+
+    document.getElementById('btn-back-calendar').onclick = () => {
+      document.getElementById('confirm-view').classList.add('hidden');
+      document.getElementById('calendar-view').classList.remove('hidden');
+      if (state.selectedDate) {
+        renderTimeSlots(state.selectedDate);
+        document.getElementById('time-slots-panel').classList.remove('hidden');
+      }
+    };
+
+    document.getElementById('btn-reschedule').onclick = () => submitReschedule();
+  }
+
+  async function submitReschedule() {
+    const btn = document.getElementById('btn-reschedule');
+    const errorEl = document.getElementById('confirm-error');
+    btn.disabled = true;
+    btn.textContent = 'Rescheduling...';
+    errorEl.classList.add('hidden');
+
+    try {
+      const isoTime = buildISOFromDateTimeAndTimezone(state.selectedDate, state.selectedTime, state.timezone);
+
+      const res = await fetch('/api/bookings/reschedule-by-token/' + encodeURIComponent(token), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          new_start_time: isoTime,
+          timezone: state.timezone,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        btn.disabled = false;
+        btn.textContent = 'Confirm Reschedule';
+        errorEl.textContent = data.error || 'Failed to reschedule. Please try again.';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+
+      // Show success
+      document.getElementById('reschedule-ui').classList.add('hidden');
+      document.getElementById('success-state').classList.remove('hidden');
+
+      const details = document.getElementById('confirmation-details');
+      // Ensure UTC parsing — API returns "YYYY-MM-DD HH:MM:SS" without timezone
+      const rawTime = data.booking.start_time.replace(' ', 'T');
+      const newStart = new Date(rawTime.endsWith('Z') ? rawTime : rawTime + 'Z');
+      const tz = state.timezone;
+      const formattedDate = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      }).format(newStart);
+
+      details.innerHTML = `
+        <div class="confirmation-detail-row">
+          <span class="confirmation-detail-label">Event</span>
+          <span class="confirmation-detail-value">${escapeHtml(data.booking.event_name)}</span>
+        </div>
+        <div class="confirmation-detail-row">
+          <span class="confirmation-detail-label">When</span>
+          <span class="confirmation-detail-value">${escapeHtml(formattedDate)}</span>
+        </div>
+        <div class="confirmation-detail-row">
+          <span class="confirmation-detail-label">Name</span>
+          <span class="confirmation-detail-value">${escapeHtml(data.booking.invitee_name)}</span>
+        </div>
+        <div class="confirmation-detail-row">
+          <span class="confirmation-detail-label">Email</span>
+          <span class="confirmation-detail-value">${escapeHtml(data.booking.invitee_email)}</span>
+        </div>
+      `;
+
+      // Add-to-calendar links for rescheduled booking
+      const duration = state.booking.duration_minutes || 30;
+      const startISO = newStart.toISOString();
+      const endDate = new Date(newStart.getTime() + duration * 60000);
+      const endISO = endDate.toISOString();
+      renderCalendarLinkButtons(
+        'calendar-links',
+        data.booking.event_name || 'Meeting',
+        '',
+        '',
+        startISO,
+        endISO
+      );
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Confirm Reschedule';
+      errorEl.textContent = 'Something went wrong. Please try again.';
+      errorEl.classList.remove('hidden');
+    }
+  }
+
+  // Utility functions
+  function showError(message) {
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('error-state').classList.remove('hidden');
+    document.getElementById('error-message').textContent = message;
+  }
+
+  function showAlready(message) {
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('already-state').classList.remove('hidden');
+    document.getElementById('already-message').textContent = message;
+  }
+
+  function formatLocalDate(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function formatTime12h(time24) {
+    const [h, m] = time24.split(':').map(Number);
+    const period = h >= 12 ? 'pm' : 'am';
+    const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    return `${h12}:${String(m).padStart(2, '0')}${period}`;
+  }
+
+  function addMinutes(time24, minutes) {
+    const [h, m] = time24.split(':').map(Number);
+    const total = h * 60 + m + minutes;
+    const newH = Math.floor(total / 60) % 24;
+    const newM = total % 60;
+    return `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`;
+  }
+
+  function buildISOFromDateTimeAndTimezone(dateStr, timeStr, tz) {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const [hour, minute] = timeStr.split(':').map(Number);
+
+    const roughUtc = new Date(Date.UTC(year, month - 1, day, hour, minute, 0, 0));
+
+    const utcFormatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'UTC', year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hour12: false,
+    });
+    const tzFormatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hour12: false,
+    });
+
+    function partsToMinutes(formatter, date) {
+      const parts = {};
+      for (const { type, value } of formatter.formatToParts(date)) {
+        parts[type] = value;
+      }
+      const h = parseInt(parts.hour === '24' ? '0' : parts.hour, 10);
+      return Date.UTC(parseInt(parts.year), parseInt(parts.month) - 1,
+        parseInt(parts.day), h, parseInt(parts.minute)) / 60000;
+    }
+
+    const utcMin = partsToMinutes(utcFormatter, roughUtc);
+    const tzMin = partsToMinutes(tzFormatter, roughUtc);
+    const offset = tzMin - utcMin;
+
+    const utcMs = roughUtc.getTime() - offset * 60000;
+    const result = new Date(utcMs);
+    return result.toISOString();
+  }
+
+  function escapeHtml(str) {
+    // Must escape quotes too: values land inside attributes (href="...", alt="...").
+    if (str == null) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  init();
+</script>
+
+</body>
+</html>

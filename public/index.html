@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Zoom App Marketplace domain ownership verification -->
+  <meta name="zoom-domain-verification" content="ZOOM_verify_25363392ebf047ee843157c928063ead">
+  <title>Calendo - Smart Scheduling, Powered by AI</title>
+  <meta name="description" content="Calendo is a free scheduling platform. Your invitees can chat with AI to find the perfect time — no more back-and-forth emails.">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="/apple-touch-icon.png">
+  <style>
+    /* ========== Reset & Base ========== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #fff;
+      color: #1a1a1a;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* ========== CSS Variables ========== */
+    :root {
+      --blue: #2563eb;
+      --blue-hover: #1d4ed8;
+      --blue-light: #eff6ff;
+      --blue-border: #bfdbfe;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      --max-width: 1100px;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+      --radius: 10px;
+    }
+
+    /* ========== Layout ========== */
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section {
+      padding: 80px 0;
+    }
+
+    /* ========== Header / Nav ========== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .header .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: -0.5px;
+      text-decoration: none;
+    }
+    .logo img {
+      height: 32px;
+      width: 32px;
+      display: block;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-links a {
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gray-700);
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .nav-links a:hover {
+      background: var(--gray-100);
+      color: var(--gray-900);
+    }
+
+    .nav-links .btn-login {
+      color: var(--blue);
+    }
+
+    /* "Get the app" / install section */
+    .get-app { background: var(--gray-50, #f8fafc); padding: 64px 0; border-top: 1px solid var(--gray-100, #f1f5f9); }
+    .get-app .container { text-align: center; }
+    .get-app h2 { font-size: 28px; margin-bottom: 8px; }
+    .get-app .get-app-sub { color: var(--gray-600, #475569); margin-bottom: 28px; }
+    .get-app-panel { display: inline-flex; flex-direction: column; align-items: center; gap: 14px; background: #fff; border: 1px solid var(--gray-200, #e2e8f0); border-radius: 16px; padding: 28px 32px; max-width: 420px; }
+    .get-app-qr img { width: 180px; height: 180px; display: block; border-radius: 8px; }
+    .get-app-panel p { color: var(--gray-600, #475569); font-size: 14px; margin: 0; }
+    .get-app-install { appearance: none; cursor: pointer; background: var(--blue); color: #fff; border: none; border-radius: 10px; padding: 12px 28px; font-size: 16px; font-weight: 600; }
+    .get-app-install:hover { background: var(--blue-hover, #1d4ed8); }
+    .get-app-ios { text-align: left; }
+    .get-app-ios ol { margin: 8px 0 0; padding-left: 20px; color: var(--gray-700, #334155); font-size: 14px; line-height: 1.7; }
+    .get-app-ios .ios-share { display: inline-block; vertical-align: -3px; }
+
+    .nav-links .btn-signup {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .nav-links .btn-signup:hover {
+      background: var(--blue-hover);
+      color: #fff;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      color: var(--gray-700);
+    }
+
+    .mobile-nav {
+      display: none;
+    }
+
+    /* ========== Hero ========== */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 52px;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+      color: var(--gray-900);
+    }
+
+    .hero h1 .highlight {
+      color: var(--blue);
+    }
+
+    .hero .subtitle {
+      font-size: 19px;
+      color: var(--gray-500);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: all 0.15s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--blue-hover);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-outline {
+      background: #fff;
+      color: var(--gray-700);
+      border: 1.5px solid var(--gray-300);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--gray-400);
+      background: var(--gray-50);
+    }
+
+    .btn-outline svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* ========== Features ========== */
+    .features {
+      background: var(--gray-50);
+    }
+
+    .section-label {
+      text-transform: uppercase;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--blue);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      color: var(--gray-900);
+      margin-bottom: 16px;
+    }
+
+    .section-subtitle {
+      font-size: 17px;
+      color: var(--gray-500);
+      max-width: 560px;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .section-header .section-subtitle {
+      margin: 0 auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 32px;
+      transition: box-shadow 0.2s;
+    }
+
+    .feature-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--blue-light);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 22px;
+      color: var(--blue);
+    }
+
+    .feature-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--gray-900);
+    }
+
+    .feature-card p {
+      font-size: 15px;
+      color: var(--gray-500);
+      line-height: 1.6;
+    }
+
+    /* ========== How It Works ========== */
+    .how-it-works {
+      background: #fff;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+      margin-top: 56px;
+    }
+
+    .step {
+      text-align: center;
+    }
+
+    .step-number {
+      width: 52px;
+      height: 52px;
+      background: var(--blue);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 auto 20px;
+    }
+
+    .step h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 8px;
+    }
+
+    .step p {
+      font-size: 15px;
+      color: var(--gray-500);
+      line-height: 1.6;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+
+    .steps-connector {
+      display: none;
+    }
+
+    /* ========== Pricing ========== */
+    .pricing {
+      background: var(--gray-50);
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .pricing-card {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 36px 32px;
+      position: relative;
+      transition: box-shadow 0.2s;
+    }
+
+    .pricing-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .pricing-card.popular {
+      border: 2px solid var(--blue);
+      box-shadow: var(--shadow-lg);
+      transform: scale(1.04);
+    }
+
+    .pricing-card.popular:hover {
+      box-shadow: var(--shadow-lg);
+    }
+
+    .popular-badge {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--blue);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 16px;
+      border-radius: 20px;
+    }
+
+    .pricing-card .plan-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 8px;
+    }
+
+    .pricing-card .price {
+      font-size: 42px;
+      font-weight: 800;
+      color: var(--gray-900);
+      letter-spacing: -1px;
+      margin-bottom: 4px;
+    }
+
+    .pricing-card .price span {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--gray-400);
+      letter-spacing: 0;
+    }
+
+    .pricing-card .plan-desc {
+      font-size: 14px;
+      color: var(--gray-500);
+      margin-bottom: 28px;
+    }
+
+    .pricing-card ul {
+      list-style: none;
+      margin-bottom: 32px;
+    }
+
+    .pricing-card ul li {
+      font-size: 14px;
+      color: var(--gray-600);
+      padding: 7px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .pricing-card ul li::before {
+      content: "";
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      background: var(--blue-light);
+      border-radius: 50%;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%232563eb'%3E%3Cpath fill-rule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clip-rule='evenodd'/%3E%3C/svg%3E");
+      background-size: 14px;
+      background-position: center;
+      background-repeat: no-repeat;
+      margin-top: 1px;
+    }
+
+    .pricing-card .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .pricing-card.popular .btn-outline {
+      background: var(--blue);
+      color: #fff;
+      border-color: var(--blue);
+    }
+
+    .pricing-card.popular .btn-outline:hover {
+      background: var(--blue-hover);
+      border-color: var(--blue-hover);
+    }
+
+    /* ========== Open Source ========== */
+    .open-source {
+      background: #fff;
+    }
+
+    .oss-content {
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .oss-content .section-title {
+      margin-bottom: 20px;
+    }
+
+    .oss-content p {
+      font-size: 17px;
+      color: var(--gray-500);
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .oss-content .oss-ctas {
+      margin-top: 32px;
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-github {
+      background: var(--gray-900);
+      color: #fff;
+    }
+
+    .btn-github:hover {
+      background: #000;
+    }
+
+    .btn-github svg {
+      width: 20px;
+      height: 20px;
+      fill: #fff;
+    }
+
+    /* ========== Footer ========== */
+    .footer {
+      background: var(--gray-900);
+      color: var(--gray-400);
+      padding: 48px 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .footer-brand .logo {
+      color: #fff;
+      font-size: 20px;
+    }
+
+    .footer-brand p {
+      font-size: 14px;
+      color: var(--gray-400);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      font-size: 14px;
+      color: var(--gray-400);
+      transition: color 0.15s;
+    }
+
+    .footer-links a:hover {
+      color: #fff;
+    }
+
+    /* ========== Mobile Responsive ========== */
+    @media (max-width: 768px) {
+      section {
+        padding: 56px 0;
+      }
+
+      .hero {
+        padding: 64px 0 56px;
+      }
+
+      .hero h1 {
+        font-size: 34px;
+        letter-spacing: -1px;
+      }
+
+      .hero .subtitle {
+        font-size: 17px;
+      }
+
+      .section-title {
+        font-size: 28px;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .steps {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .pricing-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+
+      .pricing-card.popular {
+        transform: none;
+      }
+
+      .nav-links .nav-link-desktop {
+        display: none;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .mobile-nav {
+        display: none;
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: #fff;
+        border-bottom: 1px solid var(--gray-200);
+        padding: 16px 24px;
+        box-shadow: var(--shadow-lg);
+        z-index: 99;
+      }
+
+      .mobile-nav.open {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .mobile-nav a {
+        display: block;
+        padding: 12px 16px;
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--gray-700);
+        border-radius: 6px;
+      }
+
+      .mobile-nav a:hover {
+        background: var(--gray-100);
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-links {
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 {
+        font-size: 28px;
+      }
+
+      .hero-ctas {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+        max-width: 300px;
+      }
+    }
+  </style>
+  <script>
+    // If user is already logged in, redirect to dashboard immediately
+    // Hide body until check completes to avoid flash
+    document.documentElement.style.visibility = 'hidden';
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then(r => {
+        if (r.ok) { window.location.replace('/dashboard/'); }
+        else { document.documentElement.style.visibility = 'visible'; }
+      })
+      .catch(() => { document.documentElement.style.visibility = 'visible'; });
+  </script>
+  <!-- pwa-head -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Calendo">
+  <script src="/pwa.js" defer></script>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <a href="/" class="logo"><img src="/calendo-logo-256.png" alt="Calendo logo">Calendo</a>
+      <nav class="nav-links">
+        <a href="#features" class="nav-link-desktop">Features</a>
+        <a href="#pricing" class="nav-link-desktop">Pricing</a>
+        <a href="/docs/" class="nav-link-desktop">Docs</a>
+        <a href="#get-app" class="nav-link-desktop">Get the app</a>
+        <a href="/auth/login.html" class="btn-login">Log In</a>
+        <a href="/auth/register.html" class="btn-signup">Sign Up</a>
+      </nav>
+      <button class="mobile-menu-btn" aria-label="Menu" onclick="document.getElementById('mobile-nav').classList.toggle('open'); this.setAttribute('aria-expanded', document.getElementById('mobile-nav').classList.contains('open'))">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+    <nav id="mobile-nav" class="mobile-nav">
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="/docs/">Docs</a>
+      <a href="#get-app">Get the app</a>
+      <a href="/auth/login.html">Log In</a>
+      <a href="/auth/register.html">Sign Up</a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <h1>Your scheduling.<br>An <span class="highlight">AI assistant</span> for your invitees.</h1>
+      <p class="subtitle">
+        Stop emailing back and forth. Share your link, and your invitees can pick a time. Calendar sync, reminders, and team scheduling included. <a href="#why-free" style="color:inherit;font-weight:700;text-decoration:underline;text-decoration-color:var(--primary);text-underline-offset:3px;">Always free</a>.
+      </p>
+      <div class="hero-ctas">
+        <a href="/auth/register.html" class="btn btn-primary">Get Started Free</a>
+        <a href="#features" class="btn btn-outline">See Features</a>
+      </div>
+      <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--gray-400)">No credit card needed. Set up in under 2 minutes.</p>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-label">Features</p>
+        <h2 class="section-title">Everything you need to schedule smarter</h2>
+        <p class="section-subtitle">Simple enough to start in minutes, powerful enough to handle any scheduling workflow.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <h3>AI-Powered Booking</h3>
+          <p>Your invitees chat naturally: "I need 30 minutes sometime next week." The AI checks your calendar, suggests times, and books.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <h3>Calendar Sync + Conflict Detection</h3>
+          <p>Two-way sync with Google Calendar and Outlook. Auto-detect busy times. Holiday blocking. Never double-book.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3>Team Scheduling</h3>
+          <p>Round-robin assignment with priority weighting. Collective scheduling for group availability. Built for teams of any size.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Payments & Coupons</h3>
+          <p>Charge for consultations via Stripe. Offer discount codes. Accept payments before or after booking confirmation.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <h3>Email Sequences</h3>
+          <p>Automated reminders, follow-ups, and thank-you emails. Customizable templates with variables. Set it once, forget it.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h3>Analytics & Export</h3>
+          <p>Track bookings, cancellations, no-shows, popular times. Export CSV reports. Routing form conversion analytics.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-label">How It Works</p>
+        <h2 class="section-title">Up and running in 3 steps</h2>
+        <p class="section-subtitle">No complicated setup. Get your first booking link live in under two minutes.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Create your account</h3>
+          <p>Sign up free and set your weekly availability. Tell Calendo when you're open for meetings.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>Share your link</h3>
+          <p>Get a personalized booking link for each event type. Drop it in emails, your site, or your signature.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Get booked</h3>
+          <p>Invitees pick a time or chat with AI to find the best slot. You get a confirmation &mdash; done.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-label">Pricing</p>
+        <h2 class="section-title">Simple pricing. No surprises.</h2>
+        <p class="section-subtitle">Core scheduling is free — not freemium, not a trial, just free.</p>
+      </div>
+      <div class="pricing-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 800px; margin: 0 auto;">
+        <!-- Free -->
+        <div class="pricing-card popular">
+          <span class="popular-badge">Most Popular</span>
+          <p class="plan-name">Free</p>
+          <p class="price">$0</p>
+          <p class="plan-desc">Everything most people need — no catch</p>
+          <ul>
+            <li>Unlimited event types</li>
+            <li>Unlimited bookings</li>
+            <li>Calendar sync (Google, Outlook)</li>
+            <li>Team scheduling (round-robin, collective)</li>
+            <li>Holiday auto-blocking</li>
+            <li>Email sequences</li>
+            <li>AI assistant (free to get started)</li>
+            <li>Analytics + CSV export</li>
+            <li>Meeting polls</li>
+            <li>Routing forms</li>
+            <li>Coupon codes</li>
+            <li>Webhooks &amp; API access</li>
+          </ul>
+          <a href="/auth/register.html" class="btn btn-primary" style="width:100%;justify-content:center;">Get Started Free</a>
+        </div>
+        <!-- Pro -->
+        <div class="pricing-card">
+          <p class="plan-name">Pro</p>
+          <p class="price">$2<span>/mo</span></p>
+          <p class="plan-desc">For features that cost us real money to deliver</p>
+          <ul>
+            <li>Everything in Free</li>
+            <li>AI assistant (unlimited)</li>
+            <li>SMS reminders</li>
+            <li>Remove Calendo branding</li>
+          </ul>
+          <a href="/dashboard/?tab=settings" class="btn btn-outline" style="width:100%;justify-content:center;">Upgrade to Pro</a>
+        </div>
+      </div>
+      <p style="text-align:center;margin-top:32px;font-size:15px;color:var(--gray-500);max-width:600px;margin-left:auto;margin-right:auto;">
+        Core scheduling costs us fractions of a penny per user. We pass those savings to you.
+      </p>
+    </div>
+  </section>
+
+  <!-- Why Free -->
+  <section class="open-source" id="why-free">
+    <div class="container">
+      <div class="oss-content">
+        <p class="section-label">Why it's free</p>
+        <h2 class="section-title">Scheduling costs pennies to run. We charge accordingly.</h2>
+        <p>Built by one developer on modern infrastructure, Calendo's operating costs are a fraction of what legacy platforms charge. Instead of pocketing the difference, we pass the savings to you.</p>
+        <p>Core scheduling is free — not freemium, not a trial, just free. Features that cost us real money (like AI and SMS reminders) are $2/month. That's it.</p>
+        <div class="oss-ctas">
+          <a href="/auth/register.html" class="btn btn-github">Get Started Free</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Get the app (PWA install) -->
+  <section class="get-app" id="get-app">
+    <div class="container">
+      <h2>Take Calendo with you</h2>
+      <p class="get-app-sub">Install Calendo on your phone for one-tap access to your schedule. No app store needed.</p>
+
+      <!-- Desktop: scan QR to open on phone -->
+      <div class="get-app-panel get-app-qr" id="getAppQr">
+        <img src="/install-qr.png" alt="QR code — scan to install Calendo on your phone" width="180" height="180">
+        <p>Scan with your phone's camera to install on your phone.</p>
+      </div>
+
+      <!-- Android / installable browsers: one-tap install -->
+      <div class="get-app-panel" id="getAppAndroid" hidden>
+        <button type="button" class="get-app-install" id="pwaInstallBtn" hidden>⬇&nbsp; Install Calendo</button>
+        <p id="getAppAndroidHint">To install: open your browser menu (⋮) and choose <b>Install app</b> / <b>Add to Home screen</b>.</p>
+      </div>
+
+      <!-- iPhone / iPad: manual Add to Home Screen (iOS has no install button) -->
+      <div class="get-app-panel get-app-ios" id="getAppIos" hidden>
+        <p style="font-weight:600;color:#0f172a">Install on your iPhone or iPad</p>
+        <ol>
+          <li>Tap the <b>Share</b> button
+            <svg class="ios-share" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V3"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>
+            in Safari's toolbar</li>
+          <li>Scroll and tap <b>Add to Home Screen</b></li>
+          <li>Tap <b>Add</b> — Calendo lands on your home screen</li>
+        </ol>
+      </div>
+
+      <!-- Already running as an installed app -->
+      <div class="get-app-panel" id="getAppInstalled" hidden>
+        <p style="font-weight:600;color:#16a34a">✅ You're using the installed app. You're all set!</p>
+      </div>
+    </div>
+  </section>
+  <script>
+    (function () {
+      var ua = navigator.userAgent || '';
+      var isIOS = /iphone|ipad|ipod/i.test(ua) || (/Macintosh/.test(ua) && 'ontouchend' in document);
+      var isAndroid = /android/i.test(ua);
+      var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+      var show = function (id) { var el = document.getElementById(id); if (el) el.hidden = false; };
+      var hide = function (id) { var el = document.getElementById(id); if (el) el.hidden = true; };
+      if (standalone) { hide('getAppQr'); show('getAppInstalled'); return; }
+      if (isIOS) { hide('getAppQr'); show('getAppIos'); }
+      else if (isAndroid) { hide('getAppQr'); show('getAppAndroid'); } // pwa.js reveals #pwaInstallBtn when installable
+      // Desktop: keep the QR panel (default) so they can scan it onto their phone.
+    })();
+  </script>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="logo">Calendo</span>
+          <p>Made with care by Ravi</p>
+        </div>
+        <nav class="footer-links">
+          <a href="/docs">Docs</a>
+          <a href="#get-app">Get the app</a>
+          <a href="/auth/login.html">Log In</a>
+          <a href="/auth/register.html">Sign Up</a>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

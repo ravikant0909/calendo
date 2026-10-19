@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2563eb">
+  <title>Zoom Integration Guide · Calendo</title>
+  <meta name="description" content="How to add, use, and remove the Calendo + Zoom integration: connect your Zoom account, generate Zoom links for bookings, and disconnect / delete your data.">
+  <link rel="icon" href="/favicon-32.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    :root { --blue:#2563eb; --ink:#0f172a; --muted:#475569; --border:#e2e8f0; --bg:#f8fafc; --soft:#f1f5f9; }
+    * { box-sizing: border-box; }
+    html, body { margin:0; padding:0; background:#fff; color:var(--ink);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; line-height:1.65; }
+    .wrap { max-width:780px; margin:0 auto; padding:40px 24px 80px; }
+    .brand { display:flex; align-items:center; gap:10px; margin-bottom:28px; }
+    .brand img { width:34px; height:34px; border-radius:8px; }
+    .brand span { font-weight:700; font-size:17px; }
+    h1 { font-size:30px; margin:0 0 6px; }
+    .sub { color:var(--muted); margin:0 0 28px; }
+    h2 { font-size:21px; margin:38px 0 10px; padding-top:14px; border-top:1px solid var(--border); }
+    h3 { font-size:16px; margin:22px 0 6px; }
+    p, li { color:var(--ink); font-size:15.5px; }
+    ol, ul { padding-left:22px; }
+    li { margin:6px 0; }
+    a { color:var(--blue); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    code { background:var(--soft); padding:2px 6px; border-radius:5px; font-size:90%; }
+    .note { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin:16px 0; font-size:14.5px; color:var(--muted); }
+    .toc { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:14px 18px; margin:0 0 8px; }
+    .toc a { display:block; padding:3px 0; }
+    @media (max-width:768px) { .wrap { padding:24px 16px 60px; } h1 { font-size:24px; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand"><img src="/apple-touch-icon.png" alt="Calendo"><span>Calendo</span></div>
+    <h1>Calendo + Zoom Integration Guide</h1>
+    <p class="sub">How to add the integration, use it, and remove it (including data deletion).</p>
+
+    <div class="toc">
+      <strong>Contents</strong>
+      <a href="#about">What it does</a>
+      <a href="#adding">Adding the app</a>
+      <a href="#usage">Using the app</a>
+      <a href="#removing">Removing the app &amp; your data</a>
+      <a href="#troubleshooting">Troubleshooting</a>
+    </div>
+
+    <h2 id="about">What it does</h2>
+    <p>Calendo is a scheduling platform. With the Zoom integration connected, whenever someone books a
+       meeting on your Calendo booking page for a meeting type set to <strong>Zoom</strong>, Calendo creates
+       a Zoom meeting <strong>in your own Zoom account</strong> and includes the join link in the confirmation
+       emails to you and your invitee. Each Calendo user connects their own Zoom account — meetings are never
+       created in a shared account.</p>
+    <p>Permissions requested: <code>meeting:write:meeting</code> (create the meeting) and
+       <code>user:read:user</code> (read your Zoom account email/ID to show which account is linked).</p>
+
+    <h2 id="adding">Adding the app</h2>
+    <p>Prerequisites: a free Calendo account (<a href="/auth/register">sign up</a>) and a Zoom account.</p>
+    <ol>
+      <li>Log in to Calendo and go to <a href="/integrations/zoom">Connect Zoom</a> (also reachable from
+          <strong>Settings → Integrations</strong>, or <strong>Availability → Calendar settings</strong>).</li>
+      <li>Click <strong>Connect Zoom</strong>. You'll be redirected to Zoom's authorization screen.</li>
+      <li>Review the requested permissions and click <strong>Allow</strong>.</li>
+      <li>You'll return to Calendo with a "Zoom connected" confirmation showing the linked Zoom account.</li>
+    </ol>
+    <p>You can also install Calendo from its Zoom App Marketplace listing — choosing <strong>Visit Site</strong>
+       takes you to the Connect Zoom page above.</p>
+    <p>If a step fails, see <a href="#troubleshooting">Troubleshooting</a> below.</p>
+
+    <h2 id="usage">Using the app</h2>
+    <h3>Generate Zoom links for booked meetings</h3>
+    <p><em>Prerequisite:</em> Zoom connected (see above).</p>
+    <ol>
+      <li>In Calendo, open a meeting type (<strong>Overview</strong> → a meeting type, or <strong>Meetings</strong>).</li>
+      <li>Set its <strong>Location</strong> to <strong>Zoom</strong> and save.</li>
+      <li>Share that meeting type's booking link. When an invitee books a time, Calendo creates a Zoom
+          meeting in your account and emails the join link to both of you. The meeting also appears in your
+          Zoom account's upcoming meetings.</li>
+    </ol>
+    <h3>Check which Zoom account is connected</h3>
+    <p><em>Prerequisite:</em> logged in. Go to <a href="/integrations/zoom">Connect Zoom</a> — it shows the
+       connected Zoom account's email, or a Connect button if none is linked.</p>
+
+    <h2 id="removing">Removing the app &amp; your data</h2>
+    <h3>Disconnect from within Calendo</h3>
+    <ol>
+      <li>Go to <a href="/integrations/zoom">Connect Zoom</a> (or <strong>Availability → Calendar settings</strong>).</li>
+      <li>Click <strong>Disconnect Zoom</strong>.</li>
+    </ol>
+    <h3>Remove from your Zoom account</h3>
+    <ol>
+      <li>Sign in at <a href="https://marketplace.zoom.us" target="_blank" rel="noopener">marketplace.zoom.us</a> →
+          <strong>Manage → Added Apps</strong>.</li>
+      <li>Find <strong>Calendo</strong> and click <strong>Remove</strong>.</li>
+    </ol>
+    <div class="note">
+      <strong>What de-authorization means &amp; how your data is removed:</strong> when you disconnect in Calendo
+      <em>or</em> remove the app from your Zoom account, Calendo deletes your stored Zoom data — your encrypted
+      Zoom OAuth access/refresh tokens and the connected account's email/ID. Removing the app from Zoom also
+      triggers Zoom's deauthorization webhook, which Calendo handles by deleting that data and confirming
+      deletion back to Zoom. After removal, "Zoom" meeting types will simply stop generating Zoom links
+      (existing bookings are unaffected). Deleting your entire Calendo account also deletes all Zoom data.
+    </div>
+
+    <h2 id="troubleshooting">Troubleshooting</h2>
+    <ul>
+      <li><strong>"Zoom connection failed" after authorizing:</strong> start the connection from inside Calendo
+          (<a href="/integrations/zoom">Connect Zoom</a>), not from the Zoom Marketplace "Add" button — Calendo's
+          flow needs to begin on its own site.</li>
+      <li><strong>No Zoom link on a booking:</strong> confirm Zoom is connected and that the meeting type's
+          Location is set to <strong>Zoom</strong>.</li>
+      <li><strong>Need to switch Zoom accounts:</strong> click <strong>Disconnect Zoom</strong>, then
+          <strong>Connect Zoom</strong> again and authorize with the other account.</li>
+      <li><strong>Still stuck?</strong> Email <a href="mailto:support@calendo.dev">support@calendo.dev</a>.</li>
+    </ul>
+  </div>
+  <script src="/pwa.js" defer></script>
+</body>
+</html>

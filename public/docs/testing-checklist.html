@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendo — Comprehensive Testing Checklist</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 1500px; margin: 0 auto; padding: 20px 40px; background: #fff; color: #1a1a1a; line-height: 1.6; }
+  h1 { border-bottom: 3px solid #2563eb; padding-bottom: 10px; color: #1e293b; font-size: 28px; }
+  h2 { color: #1e40af; margin-top: 48px; border-bottom: 2px solid #dbeafe; padding-bottom: 8px; font-size: 22px; }
+  h3 { color: #334155; margin-top: 28px; font-size: 17px; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0 28px 0; font-size: 13px; }
+  th, td { border: 1px solid #e2e8f0; padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: #f1f5f9; font-weight: 600; color: #334155; position: sticky; top: 0; z-index: 1; }
+  tr:nth-child(even) { background: #f8fafc; }
+  .yes { color: #16a34a; font-weight: 700; }
+  .no { color: #dc2626; font-weight: 700; }
+  .partial { color: #d97706; font-weight: 700; }
+  .extra { color: #7c3aed; font-weight: 700; }
+  .na { color: #94a3b8; font-weight: 600; }
+  .timestamp { color: #94a3b8; font-size: 13px; }
+  .summary-box { background: #f0f9ff; border: 2px solid #bfdbfe; border-radius: 10px; padding: 20px 28px; margin: 24px 0; }
+  .summary-box h3 { margin-top: 0; color: #1e40af; }
+  .toc { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px 28px; margin: 28px 0; columns: 2; column-gap: 32px; }
+  .toc ol { margin: 0; padding-left: 22px; }
+  .toc li { margin: 5px 0; break-inside: avoid; }
+  .toc a { text-decoration: none; color: #2563eb; }
+  .toc a:hover { text-decoration: underline; }
+  .metric-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin: 20px 0; }
+  .metric-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; text-align: center; }
+  .metric-card .number { font-size: 32px; font-weight: 800; color: #1e40af; }
+  .metric-card .label { font-size: 12px; color: #64748b; margin-top: 4px; }
+  .priority-tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .p-critical { background: #fee2e2; color: #991b1b; }
+  .p-high { background: #ffedd5; color: #9a3412; }
+  .p-medium { background: #fef9c3; color: #854d0e; }
+  .p-low { background: #f0fdf4; color: #166534; }
+  .section-score { float: right; background: #1e40af; color: white; padding: 4px 14px; border-radius: 16px; font-size: 14px; font-weight: 600; }
+  .legend { display: flex; gap: 20px; flex-wrap: wrap; margin: 16px 0 24px 0; padding: 12px 20px; background: #f8fafc; border-radius: 8px; font-size: 13px; }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .test-badge { display: inline-block; padding: 1px 8px; border-radius: 8px; font-size: 11px; font-weight: 600; margin: 1px 2px; }
+  .tb-unit { background: #dbeafe; color: #1e40af; }
+  .tb-e2e { background: #dcfce7; color: #166534; }
+  .tb-ai { background: #ede9fe; color: #5b21b6; }
+  .tb-smoke { background: #fef3c7; color: #92400e; }
+  .tb-none { background: #fee2e2; color: #991b1b; }
+  .test-cell { min-width: 120px; }
+  details { margin: 8px 0; }
+  details summary { cursor: pointer; font-weight: 600; color: #334155; padding: 6px 0; }
+  details summary:hover { color: #2563eb; }
+  .check-row td:first-child { font-weight: 600; }
+  .check-row input[type="checkbox"] { transform: scale(1.2); margin-right: 6px; cursor: pointer; }
+  @media print { .toc { columns: 1; } body { padding: 10px; } }
+  @media (max-width: 900px) { .metric-grid { grid-template-columns: repeat(2, 1fr); } .toc { columns: 1; } }
+</style>
+  <!-- pwa-head -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Calendo">
+  <script src="/pwa.js" defer></script>
+</head>
+<body>
+
+<h1>Calendo — Comprehensive Testing Checklist</h1>
+<p class="timestamp">Generated: April 17, 2026 | Final pre-launch QA pass</p>
+
+<!-- Executive Summary -->
+<div class="summary-box">
+<h3>How to Use This Document</h3>
+<p>Features are ranked by <strong>usage priority</strong> (most-used first). Each feature includes: what it does, why it exists, how to test it via UI and AI, whether Calendly has it, and what automated test coverage exists. Use the checkboxes to track your manual testing progress.</p>
+<p><strong>Test coverage legend:</strong>
+  <span class="test-badge tb-unit">Unit</span> = Vitest unit tests &nbsp;
+  <span class="test-badge tb-e2e">E2E</span> = Playwright browser tests &nbsp;
+  <span class="test-badge tb-ai">AI</span> = Testable via AI assistant &nbsp;
+  <span class="test-badge tb-smoke">Smoke</span> = HTTP smoke tests &nbsp;
+  <span class="test-badge tb-none">None</span> = No automated coverage
+</p>
+</div>
+
+<!-- Stats -->
+<div class="metric-grid">
+  <div class="metric-card">
+    <div class="number">91</div>
+    <div class="label">API Endpoints</div>
+  </div>
+  <div class="metric-card">
+    <div class="number">34</div>
+    <div class="label">AI Tools</div>
+  </div>
+  <div class="metric-card">
+    <div class="number">769</div>
+    <div class="label">Automated Tests</div>
+  </div>
+  <div class="metric-card">
+    <div class="number">18</div>
+    <div class="label">E2E Spec Files</div>
+  </div>
+  <div class="metric-card">
+    <div class="number">76%</div>
+    <div class="label">Calendly Parity</div>
+  </div>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <span><span class="priority-tag p-critical">P0 Critical</span> Blocks launch</span>
+  <span><span class="priority-tag p-high">P1 High</span> Core daily use</span>
+  <span><span class="priority-tag p-medium">P2 Medium</span> Important but not daily</span>
+  <span><span class="priority-tag p-low">P3 Low</span> Nice to have</span>
+  <span><strong class="yes">YES</strong> = Calendly has it</span>
+  <span><strong class="extra">EXTRA</strong> = Calendo-only</span>
+  <span><strong class="no">NO</strong> = Not in Calendo</span>
+</div>
+
+<!-- TOC -->
+<div class="toc">
+<strong>Table of Contents</strong>
+<ol>
+  <li><a href="#auth">Authentication &amp; Onboarding</a> <span class="priority-tag p-critical">P0</span></li>
+  <li><a href="#booking-flow">Public Booking Flow</a> <span class="priority-tag p-critical">P0</span></li>
+  <li><a href="#event-types">Event Types</a> <span class="priority-tag p-critical">P0</span></li>
+  <li><a href="#meetings">Meetings &amp; Booking Management</a> <span class="priority-tag p-critical">P0</span></li>
+  <li><a href="#availability">Availability &amp; Schedules</a> <span class="priority-tag p-high">P1</span></li>
+  <li><a href="#calendar">Calendar Integration</a> <span class="priority-tag p-high">P1</span></li>
+  <li><a href="#notifications">Notifications &amp; Emails</a> <span class="priority-tag p-high">P1</span></li>
+  <li><a href="#payments">Payments (Stripe &amp; PayPal)</a> <span class="priority-tag p-high">P1</span></li>
+  <li><a href="#ai">AI Assistant</a> <span class="priority-tag p-high">P1</span></li>
+  <li><a href="#teams">Teams &amp; Organizations</a> <span class="priority-tag p-medium">P2</span></li>
+  <li><a href="#analytics">Analytics &amp; Reporting</a> <span class="priority-tag p-medium">P2</span></li>
+  <li><a href="#settings">Settings &amp; Branding</a> <span class="priority-tag p-medium">P2</span></li>
+  <li><a href="#embed">Embedding &amp; Distribution</a> <span class="priority-tag p-medium">P2</span></li>
+  <li><a href="#routing">Routing Forms</a> <span class="priority-tag p-medium">P2</span></li>
+  <li><a href="#advanced">Advanced Features</a> <span class="priority-tag p-low">P3</span></li>
+  <li><a href="#admin">Admin &amp; Infrastructure</a> <span class="priority-tag p-low">P3</span></li>
+</ol>
+</div>
+
+
+<!-- ================================================================ -->
+<h2 id="auth">1. Authentication &amp; Onboarding <span class="section-score">P0 Critical</span></h2>
+<!-- ================================================================ -->
+
+<p><strong>Why it exists:</strong> Every user interaction starts here. If auth is broken, nothing else works. Onboarding determines first impressions and whether users complete setup.</p>
+
+<table>
+  <tr>
+    <th style="width:3%"></th>
+    <th style="width:16%">Feature</th>
+    <th style="width:22%">What &amp; Why</th>
+    <th style="width:20%">How to Test (UI)</th>
+    <th style="width:15%">How to Test (AI)</th>
+    <th style="width:6%">Calendly</th>
+    <th style="width:18%" class="test-cell">Automated Coverage</th>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Email/Password Registration</td>
+    <td>Create account with email, password, name. Auto-creates booking page + default schedule + 4 starter event types. Sends verification email.</td>
+    <td>Go to /auth/register. Fill form, submit. Verify redirect to dashboard. Check for verification email in inbox.</td>
+    <td class="na">N/A — pre-auth</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> auth.test.js (11 tests)<br><span class="test-badge tb-e2e">E2E</span> auth.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Email/Password Login</td>
+    <td>Authenticate with credentials. Returns session cookie (HttpOnly, Secure, SameSite).</td>
+    <td>Go to /auth/login. Enter credentials. Verify dashboard loads. Try wrong password — expect error.</td>
+    <td class="na">N/A — pre-auth</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> auth.test.js<br><span class="test-badge tb-e2e">E2E</span> auth.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Google OAuth Login</td>
+    <td>One-click Google sign in. Creates account if new, logs in if existing.</td>
+    <td>Click "Continue with Google" on login page. Complete OAuth flow. Verify dashboard loads.</td>
+    <td class="na">N/A — pre-auth</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> oauth-video-outlook.test.js<br><span class="test-badge tb-e2e">E2E</span> auth.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Microsoft OAuth Login</td>
+    <td>Same as Google but via Microsoft identity platform.</td>
+    <td>Click "Continue with Microsoft" on login page. Complete OAuth flow.</td>
+    <td class="na">N/A — pre-auth</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> oauth-video-outlook.test.js<br><span class="test-badge tb-e2e">E2E</span> auth.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Forgot / Reset Password</td>
+    <td>Sends reset link via email. Token-validated reset form.</td>
+    <td>Click "Forgot password" on login. Enter email. Check inbox for link. Click link, set new password, verify login works.</td>
+    <td>Ask AI: "Reset my password" → triggers trigger_password_reset tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> password-reset.test.js<br><span class="test-badge tb-e2e">E2E</span> auth.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Email Verification</td>
+    <td>Sends verification email on registration. Banner on dashboard until verified. Resend button.</td>
+    <td>Register new account. Check for yellow banner. Click resend. Click link in email. Verify banner disappears on refresh.</td>
+    <td>Ask AI: "Resend my verification email" → resend_verification tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> slack-email-verify.test.js (1 known failure)<br><span class="test-badge tb-e2e">E2E</span> auth.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Logout</td>
+    <td>Destroys session, clears cookie, redirects to login.</td>
+    <td>Click profile icon → Logout. Verify redirect to login. Try accessing /dashboard — should redirect.</td>
+    <td class="na">N/A</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-e2e">E2E</span> auth.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Onboarding Wizard</td>
+    <td>4-step guided setup for new users: Welcome → Availability → Location → Meet AI. Dismissed after completion. Sets initial schedule and event type location.</td>
+    <td>Register fresh account. Verify wizard appears. Complete all 4 steps. Verify wizard doesn't reappear on refresh.</td>
+    <td class="na">N/A — first-run only</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-e2e">E2E</span> dashboard-flows.spec.js</td>
+  </tr>
+</table>
+
+
+<!-- ================================================================ -->
+<h2 id="booking-flow">2. Public Booking Flow <span class="section-score">P0 Critical</span></h2>
+<!-- ================================================================ -->
+
+<p><strong>Why it exists:</strong> This is the core product — an invitee visits your booking page and schedules a meeting. If this breaks, Calendo is useless. Every sub-feature here directly affects whether invitees can successfully book.</p>
+
+<table>
+  <tr>
+    <th style="width:3%"></th>
+    <th style="width:16%">Feature</th>
+    <th style="width:22%">What &amp; Why</th>
+    <th style="width:20%">How to Test (UI)</th>
+    <th style="width:15%">How to Test (AI)</th>
+    <th style="width:6%">Calendly</th>
+    <th style="width:18%" class="test-cell">Automated Coverage</th>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Booking Page Load</td>
+    <td>Public page at /booking/USERNAME. Shows host profile (avatar, name, bio), list of event types with colors and durations. Skeleton loading states while fetching.</td>
+    <td>Visit /booking/USERNAME. Verify host info displays. Verify all non-secret event types appear with correct names, durations, colors.</td>
+    <td>Ask AI: "What's my booking link?" → get_booking_link tool. Then visit the URL.</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> api.test.js<br><span class="test-badge tb-e2e">E2E</span> booking-flow.spec.js, launch-booking-flow.spec.js<br><span class="test-badge tb-smoke">Smoke</span> smoke-local.mjs</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Event Type Selection</td>
+    <td>Click an event type card to proceed to date/time selection. Shows name, duration, description.</td>
+    <td>Click an event type. Verify calendar view appears with month navigation.</td>
+    <td class="na">N/A — invitee action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-e2e">E2E</span> booking-flow.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Calendar Date Selection</td>
+    <td>Monthly calendar showing available/unavailable days. Days with no slots are grayed out. Navigate between months.</td>
+    <td>Verify today or future days are clickable. Verify past days are grayed. Click a date — time slots should appear. Navigate to next month.</td>
+    <td class="na">N/A — invitee action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> availability.test.js<br><span class="test-badge tb-e2e">E2E</span> booking-flow.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Time Slot Selection</td>
+    <td>Shows available time slots for selected date. Accounts for: weekly availability, date overrides, buffer times, min notice, existing bookings, calendar conflicts, daily limits, holidays.</td>
+    <td>Select a date. Verify slots appear. Verify no slots outside availability hours. Book a slot, then check the same time is gone from the list.</td>
+    <td class="na">N/A — invitee action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> availability.test.js (core logic), availability-meeting-limits.test.js<br><span class="test-badge tb-e2e">E2E</span> booking-flow.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Timezone Selection</td>
+    <td>Invitee picks their timezone. All displayed times auto-convert. Defaults to browser timezone via Intl API.</td>
+    <td>Open booking page. Verify timezone matches your browser. Change timezone — verify all slots update to new timezone.</td>
+    <td class="na">N/A — invitee action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> availability.test.js<br><span class="test-badge tb-e2e">E2E</span> booking-flow.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Booking Confirmation Form</td>
+    <td>Collects invitee name, email, optional phone. Shows selected time, event name, duration.</td>
+    <td>Select a time. Verify form appears with name + email required. Submit with missing fields — expect validation. Fill and submit — expect confirmation.</td>
+    <td class="na">N/A — invitee action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-e2e">E2E</span> booking-flow.spec.js, launch-booking-flow.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Custom Booking Questions</td>
+    <td>Dynamic questions configured per event type. Types: text, textarea, dropdown. Required/optional. Answers stored on booking and visible in sidebar.</td>
+    <td>Create event type with custom questions. Book it. Verify questions appear on form. Verify required validation. Verify answers appear in meeting detail sidebar.</td>
+    <td class="na">N/A — invitee action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> conditional-sms.test.js<br><span class="test-badge tb-e2e">E2E</span> booking-advanced.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Conditional Question Logic</td>
+    <td>show_when conditions: show/hide questions based on previous answers. Chained conditions supported.</td>
+    <td>Create event type with Q1 dropdown and Q2 with show_when on Q1 answer. Book it. Select Q1 answer — Q2 should appear/disappear dynamically.</td>
+    <td class="na">N/A — invitee action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> conditional-sms.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Guest Emails</td>
+    <td>Invitee can add up to 10 guest emails (if allow_guests enabled). Guests receive notification emails and are added to calendar events.</td>
+    <td>Create event type with allow_guests=true. Book it. Add 2 guest emails. Verify guests appear in booking details. Verify guests get notification emails.</td>
+    <td class="na">N/A — invitee action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> booking-guests.test.js<br><span class="test-badge tb-e2e">E2E</span> booking-advanced.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Confirmation Page</td>
+    <td>Animated checkmark, booking details, meeting link (if video), add-to-calendar buttons (Google, Outlook, .ics download), cancel/reschedule links.</td>
+    <td>Complete a booking. Verify confirmation page shows all details. Click "Add to Google Calendar" — verify it opens Google with correct data. Download .ics — verify it opens in a calendar app.</td>
+    <td class="na">N/A — invitee action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-e2e">E2E</span> booking-flow.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Invitee Cancel</td>
+    <td>Invitee cancels their own booking via token-protected link (in confirmation email). Shows confirmation page.</td>
+    <td>Book a meeting. Use the cancel link from confirmation email/page. Verify cancellation succeeds. Verify host gets notification. Verify booking shows as cancelled in dashboard.</td>
+    <td class="na">N/A — invitee action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> cancel-reschedule.test.js<br><span class="test-badge tb-e2e">E2E</span> cancel-reschedule.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Invitee Reschedule</td>
+    <td>Invitee reschedules via token-protected link. Shows new availability calendar. Old slot freed, new slot booked. Both parties notified.</td>
+    <td>Book a meeting. Use reschedule link. Pick a new time. Verify old slot is freed. Verify new booking appears in dashboard. Verify notification emails.</td>
+    <td class="na">N/A — invitee action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> cancel-reschedule.test.js<br><span class="test-badge tb-e2e">E2E</span> cancel-reschedule.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Recurring Bookings</td>
+    <td>Invitee can book weekly/biweekly/monthly with end date (max 52 occurrences). Conflicts auto-skipped. Cancel scope: single or all-future.</td>
+    <td>Book an event type. Select "Weekly" recurrence with end date 4 weeks out. Verify multiple bookings created. Cancel one — verify "Cancel this only" vs "Cancel all future" options.</td>
+    <td class="na">N/A — invitee action</td>
+    <td class="extra">EXTRA</td>
+    <td><span class="test-badge tb-e2e">E2E</span> booking-advanced.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Prefilled Links</td>
+    <td>?name=X&email=Y query params auto-fill the booking form. Useful for CRM integrations and email links.</td>
+    <td>Visit /booking/USER?name=John&email=john@test.com. Verify name and email are pre-filled on the form.</td>
+    <td class="na">N/A — invitee action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> review-regressions.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Group Events</td>
+    <td>Multiple invitees can book the same slot (up to group_max_attendees). Shows "X spots left" on booking page. 409 at capacity.</td>
+    <td>Create event type with group_max_attendees=3. Book it from 3 different browsers/incognito. Verify "2 spots left" updates. 4th booking should fail.</td>
+    <td class="na">N/A — invitee action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> group-events.test.js<br><span class="test-badge tb-e2e">E2E</span> advanced-event-types.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Redirect After Booking</td>
+    <td>If redirect_url set on event type, invitee is redirected to that URL after booking. Appends invitee_name, invitee_email, event_type, start_time as query params.</td>
+    <td>Set redirect_url on an event type (e.g. https://example.com/thanks). Book it. Verify redirect with correct query params.</td>
+    <td class="na">N/A — invitee action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> redirect-url.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Secret Event Types</td>
+    <td>is_secret events are hidden from public booking page and AI chatbot. Only accessible via direct link.</td>
+    <td>Create a secret event type. Visit booking page — verify it's not listed. Visit direct link /booking/USER?event=SLUG — verify it works.</td>
+    <td class="na">N/A — invitee action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> secret-events.test.js<br><span class="test-badge tb-e2e">E2E</span> advanced-event-types.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Email/Domain Blocklist</td>
+    <td>Block specific emails or domains from booking. Checked at booking time.</td>
+    <td>Add "spammer.com" to blocked emails in Settings. Try booking with user@spammer.com — expect rejection.</td>
+    <td>Ask AI: "Block all bookings from spammer.com" → update_settings tool</td>
+    <td class="extra">EXTRA</td>
+    <td><span class="test-badge tb-unit">Unit</span> review-regressions.test.js</td>
+  </tr>
+</table>
+
+
+<!-- ================================================================ -->
+<h2 id="event-types">3. Event Types <span class="section-score">P0 Critical</span></h2>
+<!-- ================================================================ -->
+
+<p><strong>Why it exists:</strong> Event types are the building blocks of Calendo — they define what meetings a user offers. Each has dozens of configurable options. Incorrectly saving any field means meetings are booked wrong.</p>
+
+<table>
+  <tr>
+    <th style="width:3%"></th>
+    <th style="width:16%">Feature</th>
+    <th style="width:22%">What &amp; Why</th>
+    <th style="width:20%">How to Test (UI)</th>
+    <th style="width:15%">How to Test (AI)</th>
+    <th style="width:6%">Calendly</th>
+    <th style="width:18%" class="test-cell">Automated Coverage</th>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Create Event Type</td>
+    <td>Name, slug (auto-generated), duration, description, color. Gets own bookable URL.</td>
+    <td>Click "New Event Type" in Event Types tab. Fill name + duration. Save. Verify it appears in list and on booking page.</td>
+    <td>Ask AI: "Create a 45-minute event type called Team Sync" → create_event_type tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> api.test.js<br><span class="test-badge tb-e2e">E2E</span> event-types.spec.js<br><span class="test-badge tb-ai">AI</span> ai-dashboard.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Edit Event Type</td>
+    <td>Update any field. Changes take effect immediately on booking page.</td>
+    <td>Click edit on an event type. Change name and duration. Save. Verify booking page reflects changes.</td>
+    <td>Ask AI: "Change my 15 Minute Chat to 20 minutes" → update_event_type tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> api.test.js<br><span class="test-badge tb-e2e">E2E</span> event-types.spec.js<br><span class="test-badge tb-ai">AI</span> ai-dashboard.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Delete Event Type</td>
+    <td>Permanently removes event type. Existing bookings are preserved.</td>
+    <td>Delete an event type. Verify it's gone from dashboard and booking page. Verify existing bookings still show in Meetings tab.</td>
+    <td>Ask AI: "Delete the Team Sync event type" → delete_event_type tool (asks confirmation)</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-e2e">E2E</span> event-types.spec.js<br><span class="test-badge tb-ai">AI</span> ai-dashboard.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Color Selection</td>
+    <td>24 preset color swatches. Color shows on booking page dot, calendar view, event type cards. Preview dot in editor and dashboard summary.</td>
+    <td>Edit event type. Click a different color swatch. Verify preview dot updates immediately. Save. Verify color shows correctly on booking page and calendar view.</td>
+    <td>Ask AI: "Change my 15 Minute Chat color to green" → update_event_type tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> api.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Location / Video Conferencing</td>
+    <td>Options: Google Meet (auto-generated link), Zoom (server-to-server OAuth), Microsoft Teams, Phone, In-Person, Custom URL. Location shows on confirmation + calendar event.</td>
+    <td>Set location to Google Meet. Book it. Verify Meet link appears on confirmation and in calendar. Test each location type.</td>
+    <td>Ask AI: "Set my 15 Minute Chat location to Zoom" → update_event_type tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> oauth-video-outlook.test.js<br><span class="test-badge tb-e2e">E2E</span> event-types.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Buffer Times</td>
+    <td>buffer_before and buffer_after (minutes). Prevents back-to-back bookings. Buffers are subtracted from available slots.</td>
+    <td>Set buffer_before=15 on an event type. Book at 10:00. Verify 9:45 slot is no longer available for other event types.</td>
+    <td>Ask AI: "Add a 10 minute buffer before my 15 Minute Chat" → update_event_type tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> availability.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Minimum Notice</td>
+    <td>min_notice_hours — prevent last-minute bookings. Slots within this window are hidden.</td>
+    <td>Set min_notice_hours=24 on an event type. Verify no slots appear for today or tomorrow morning.</td>
+    <td>Ask AI: "Set minimum notice to 2 hours for my Quick Chat" → update_event_type tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> availability.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Max Days Ahead</td>
+    <td>max_days_ahead — limits how far into the future invitees can book (rolling window).</td>
+    <td>Set max_days_ahead=7. Verify booking page only shows next 7 days of availability.</td>
+    <td>Ask AI: "Limit booking to 14 days ahead for my 30 Minute Call" → update_event_type tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> availability.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Max Bookings Per Day</td>
+    <td>max_bookings_per_day — daily cap. Once reached, remaining slots for that day are hidden.</td>
+    <td>Set max_bookings_per_day=2. Book twice on same day. Verify no more slots appear for that day.</td>
+    <td>Ask AI: "Limit my Quick Chat to 3 bookings per day" → update_event_type tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> availability-meeting-limits.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Slot Interval</td>
+    <td>slot_interval — control granularity of shown slots (e.g. every 15 min vs every 30 min). Defaults to event duration.</td>
+    <td>Set 30-min event with slot_interval=15. Verify slots show at :00, :15, :30, :45 instead of every 30 min.</td>
+    <td class="na">N/A — UI config only</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> availability.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Reminder Toggles</td>
+    <td>Per-event-type toggles for 24h and 1h email reminders. Processed by cron every 5 minutes.</td>
+    <td>Toggle reminder_24h off on an event type. Book it. Verify no 24h reminder email is sent (check after 24h or inspect cron logic).</td>
+    <td class="na">N/A — UI config only</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> email.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Reconfirmation</td>
+    <td>If enabled, sends reconfirmation email X hours before meeting. Invitee clicks link to confirm attendance.</td>
+    <td>Enable reconfirmation on event type (e.g. 48h before). Book it. Verify reconfirmation email is sent at the right time. Click confirm link. Verify status in meeting detail sidebar.</td>
+    <td class="na">N/A — UI config only</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> qr-reconfirm.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Pricing (Stripe)</td>
+    <td>price + currency per event type. Invitee pays via Stripe Checkout before booking is confirmed.</td>
+    <td>Set price=$10 on an event type. Book it. Verify Stripe checkout opens. Complete payment. Verify booking is confirmed.</td>
+    <td class="na">N/A — invitee payment flow</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> payments.test.js, stripe-booking-ui.test.js<br><span class="test-badge tb-e2e">E2E</span> advanced-event-types.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Pricing (PayPal)</td>
+    <td>Same as Stripe but using PayPal. Requires BYOK PayPal credentials.</td>
+    <td>Configure PayPal in Settings → Integrations. Set price on event type. Book it. Verify PayPal approval flow. Verify booking confirmed after capture.</td>
+    <td class="na">N/A — invitee payment flow</td>
+    <td class="no">NO</td>
+    <td><span class="test-badge tb-unit">Unit</span> paypal-payments.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Availability Schedule Assignment</td>
+    <td>Each event type can be assigned to a specific availability schedule. Defaults to the default schedule.</td>
+    <td>Create 2 schedules with different hours. Assign event type A to schedule 1, B to schedule 2. Verify different slots appear on booking page for each.</td>
+    <td class="na">N/A — UI config only</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> availability-api.test.js</td>
+  </tr>
+</table>
+
+
+<!-- ================================================================ -->
+<h2 id="meetings">4. Meetings &amp; Booking Management <span class="section-score">P0 Critical</span></h2>
+<!-- ================================================================ -->
+
+<p><strong>Why it exists:</strong> After bookings are created, hosts need to view, manage, search, cancel, reschedule, and take notes. This is the primary day-to-day interface for active Calendo users.</p>
+
+<table>
+  <tr>
+    <th style="width:3%"></th>
+    <th style="width:16%">Feature</th>
+    <th style="width:22%">What &amp; Why</th>
+    <th style="width:20%">How to Test (UI)</th>
+    <th style="width:15%">How to Test (AI)</th>
+    <th style="width:6%">Calendly</th>
+    <th style="width:18%" class="test-cell">Automated Coverage</th>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Meetings List (Upcoming)</td>
+    <td>Timeline view of confirmed bookings grouped by date. Uniform 52px card rows with color dot, time, title, invitee name. Today divider with blue line.</td>
+    <td>Go to Meetings tab. Verify upcoming bookings appear chronologically. Verify today divider is positioned correctly. Verify card heights are uniform.</td>
+    <td>Ask AI: "Show my upcoming meetings" → get_bookings tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> meeting-detail-sidebar.test.js<br><span class="test-badge tb-e2e">E2E</span> booking-management.spec.js<br><span class="test-badge tb-ai">AI</span> ai-dashboard.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Meeting Detail Sidebar</td>
+    <td>Click a meeting card → right sidebar slides in (420px) showing: status badge, title, date/time, invitee info (avatar, name, email), location with join link, booking questions &amp; answers, private notes (editable textarea), timeline (booked at, booked by), reconfirmation status, event type reference, action buttons (Join, Cancel, Mark No-Show).</td>
+    <td>Click a meeting. Verify sidebar opens with all sections. Edit notes — verify save. Click close or overlay — verify sidebar closes. Verify invitee avatar renders from Gravatar.</td>
+    <td class="na">N/A — sidebar is UI-only</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> meeting-detail-sidebar.test.js (24 tests)</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Search Meetings</td>
+    <td>Real-time search across meeting titles and invitee names. Filters the visible list.</td>
+    <td>Type an invitee name in the search box. Verify only matching meetings appear. Clear search — verify all meetings return.</td>
+    <td>Ask AI: "Find my meetings with Jane" → get_bookings tool (returns all, AI filters)</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-e2e">E2E</span> booking-management.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Tab Filters (Upcoming/Past/Cancelled)</td>
+    <td>Three pill tabs to filter by booking status. Counts shown on each tab.</td>
+    <td>Click each tab. Verify correct bookings appear. Cancel a booking — verify it moves from Upcoming to Cancelled tab.</td>
+    <td>Ask AI: "Show my cancelled meetings" → get_bookings(filter: 'cancelled') tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-e2e">E2E</span> booking-management.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Host Cancel Booking</td>
+    <td>Host cancels a booking. Sends cancellation emails to invitee + guests. Supports cancel scope: single or all-future (for recurring). Booking disappears from upcoming view without page refresh.</td>
+    <td>Open meeting sidebar. Click Cancel. Confirm dialog. Verify booking disappears from list immediately. Verify cancellation email sent. For recurring: verify "Cancel this" vs "Cancel all future" options.</td>
+    <td>Ask AI: "Cancel my meeting with Test User" → cancel_booking tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> cancel-reschedule.test.js<br><span class="test-badge tb-e2e">E2E</span> cancel-reschedule.spec.js<br><span class="test-badge tb-ai">AI</span> ai-dashboard.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Mark No-Show</td>
+    <td>Host marks a past booking as no-show. Updates status. Available from meeting detail sidebar.</td>
+    <td>Go to Past tab. Open a past meeting sidebar. Click "Mark No-Show". Confirm. Verify status badge changes.</td>
+    <td>Ask AI: "Mark my last meeting as a no-show" → mark_no_show tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> no-show.test.js<br><span class="test-badge tb-ai">AI</span> ai-dashboard.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Private Host Notes</td>
+    <td>Textarea in meeting sidebar for private notes (only host sees). Saves via PUT /api/bookings/:id/notes. Persists across page loads.</td>
+    <td>Open meeting sidebar. Type notes. Click Save. Refresh page. Reopen sidebar — verify notes are still there.</td>
+    <td>Ask AI: "Add a note to my meeting with Test User: Follow up on proposal" → add_booking_notes tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-ai">AI</span> ai-dashboard.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Book on Behalf</td>
+    <td>Host books a meeting for an invitee without them visiting the booking page. Opens a form in Meetings tab.</td>
+    <td>Click "Book on Behalf" button in Meetings tab. Fill invitee details + select event type + pick time. Submit. Verify booking created and invitee gets confirmation email.</td>
+    <td class="na">N/A — form-based UI action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> review-regressions.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Refund Paid Booking</td>
+    <td>Host refunds a paid booking via Stripe. Only shown for paid + confirmed bookings.</td>
+    <td>Cancel a paid booking. Verify refund button appears. Click refund. Verify Stripe refund is processed.</td>
+    <td class="na">N/A — Stripe action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> payments.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Calendar Weekly View</td>
+    <td>Weekly grid merging Calendo bookings (green) + Google Calendar events (red) + Outlook events (blue). Click any event to open detail sidebar. Prev/Next/Today navigation.</td>
+    <td>Go to Calendar tab. Verify Calendo bookings appear in green. Verify Google events appear in red. Verify no duplicates. Click an event — verify sidebar opens. Navigate weeks.</td>
+    <td class="na">N/A — visual UI</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> calendar.test.js (dedup tests)</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Calendar → Cancel/No-Show</td>
+    <td>Cancel or no-show from Calendar tab detail sidebar auto-refreshes the calendar grid without page reload.</td>
+    <td>Open Calendar tab. Click a Calendo booking. Click Cancel in sidebar. Verify event disappears from grid immediately.</td>
+    <td class="na">N/A — visual UI</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-none">None</span> (manual only)</td>
+  </tr>
+</table>
+
+<!-- ================================================================ -->
+<h2 id="availability">5. Availability &amp; Schedules <span class="section-score">P1 High</span></h2>
+<!-- ================================================================ -->
+
+<p><strong>Why it exists:</strong> Availability defines when invitees can book. Incorrect rules mean double-bookings, phantom slots, or empty calendars. The schedule editor is used at setup and whenever hours change.</p>
+
+<table>
+  <tr>
+    <th style="width:3%"></th>
+    <th style="width:16%">Feature</th>
+    <th style="width:22%">What &amp; Why</th>
+    <th style="width:20%">How to Test (UI)</th>
+    <th style="width:15%">How to Test (AI)</th>
+    <th style="width:6%">Calendly</th>
+    <th style="width:18%" class="test-cell">Automated Coverage</th>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Weekly Schedule Editor</td>
+    <td>Per-day time ranges (e.g. Mon 9:00-12:00, 1:00-5:00). Multiple windows per day. Days can be toggled unavailable. Compact day circles UI.</td>
+    <td>Go to Availability → Schedules. Toggle Monday off → verify "Unavailable". Add second window on Tuesday. Save. Verify booking page reflects changes.</td>
+    <td>Ask AI: "Set my Monday hours to 10am-2pm" → update_availability_schedule tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> availability-api.test.js, availability.test.js<br><span class="test-badge tb-e2e">E2E</span> availability.spec.js<br><span class="test-badge tb-ai">AI</span> ai-dashboard.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Multiple Schedules</td>
+    <td>Create named schedules (e.g. "Summer Hours", "Weekends Only"). Assign to specific event types. One default schedule.</td>
+    <td>Create a second schedule with different hours. Assign it to one event type. Verify that event type shows different slots than others.</td>
+    <td>Ask AI: "Create a new schedule called Weekend Hours" → create_availability_schedule tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> availability-api.test.js<br><span class="test-badge tb-ai">AI</span> ai-dashboard.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Copy Hours to Other Days</td>
+    <td>Copy icon on each day row copies that day's time ranges to selected other days. Saves time vs editing each day individually.</td>
+    <td>Set Monday 9-5. Click copy icon on Monday. Select Tue-Fri. Verify all days now show 9-5.</td>
+    <td class="na">N/A — UI shortcut only</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-none">None</span></td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Date-Specific Overrides</td>
+    <td>Block specific dates or set custom hours for specific dates. Mini calendar for date picking. Overrides trump weekly rules.</td>
+    <td>Add override: block April 25. Add override: April 26 with custom hours 2pm-4pm. Verify booking page shows no slots on April 25 and only 2-4pm on April 26.</td>
+    <td>Ask AI: "Block April 25 from my schedule" → update_date_overrides tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> availability.test.js<br><span class="test-badge tb-ai">AI</span> ai-tools-99.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Holiday Presets</td>
+    <td>Load holidays by country (90+ countries via Nager.Date API + hardcoded India). Per-holiday toggle (enabled/disabled). Holidays block availability.</td>
+    <td>Go to Advanced Settings. Select "United States" from country dropdown. Verify holidays load. Toggle Christmas off. Save. Verify Dec 25 has normal availability.</td>
+    <td>Ask AI: "Load US holidays" or "Disable Christmas from my holidays" → update_holidays tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> availability-meeting-limits.test.js<br><span class="test-badge tb-ai">AI</span> ai-tools-99.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Meeting Limits (Daily/Weekly)</td>
+    <td>Cap total meetings per day and/or per week across all event types. Stored on availability_schedules.meeting_limits JSON column.</td>
+    <td>Go to Advanced Settings. Set daily limit to 3. Book 3 meetings on a day. Verify 4th booking attempt shows no available slots.</td>
+    <td>Ask AI: "Set my daily meeting limit to 5" → set_meeting_limits tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> availability-meeting-limits.test.js<br><span class="test-badge tb-ai">AI</span> ai-tools-99.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Timezone Setting</td>
+    <td>Each schedule has a timezone. All availability rules are interpreted in that timezone. Dropdown with all IANA timezones.</td>
+    <td>Change schedule timezone to a different zone. Verify booking page slots shift accordingly.</td>
+    <td class="na">N/A — part of schedule update</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> availability.test.js</td>
+  </tr>
+</table>
+
+
+<!-- ================================================================ -->
+<h2 id="calendar">6. Calendar Integration <span class="section-score">P1 High</span></h2>
+<!-- ================================================================ -->
+
+<p><strong>Why it exists:</strong> Calendar sync prevents double-bookings by checking conflicts against the user's real calendar. It also writes new Calendo bookings to the user's calendar automatically.</p>
+
+<table>
+  <tr>
+    <th style="width:3%"></th>
+    <th style="width:16%">Feature</th>
+    <th style="width:22%">What &amp; Why</th>
+    <th style="width:20%">How to Test (UI)</th>
+    <th style="width:15%">How to Test (AI)</th>
+    <th style="width:6%">Calendly</th>
+    <th style="width:18%" class="test-cell">Automated Coverage</th>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Connect Google Calendar</td>
+    <td>OAuth flow to connect Google Calendar. Requests calendar.events + calendar.readonly scopes. Stores encrypted tokens.</td>
+    <td>Go to Availability → Calendar Settings. Click "Connect Google Calendar". Complete OAuth. Verify calendar appears in list.</td>
+    <td>Ask AI: "Show my connected calendars" → get_connected_calendars tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> calendar.test.js (22 tests)<br><span class="test-badge tb-e2e">E2E</span> settings.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Connect Outlook Calendar</td>
+    <td>OAuth flow to connect Microsoft Outlook/Office 365 calendar. Token refresh with proactive handling and 401 retry.</td>
+    <td>Click "Connect Outlook Calendar". Complete Microsoft OAuth. Verify calendar appears.</td>
+    <td>Ask AI: "Show my connected calendars" → get_connected_calendars tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> oauth-video-outlook.test.js, outlook-token-refresh.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Conflict Checking</td>
+    <td>Per-calendar toggle: check_conflicts. When enabled, busy events on that calendar block Calendo slots. Prevents double-booking.</td>
+    <td>Toggle conflict checking on for Google Calendar. Create an event in Google Calendar at 2pm. Verify 2pm slot disappears from Calendo booking page.</td>
+    <td>Ask AI: "Turn off conflict checking for my Google Calendar" → update_calendar_settings tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> calendar-settings-api.test.js<br><span class="test-badge tb-ai">AI</span> ai-tools-99.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Event Writing</td>
+    <td>Per-calendar toggle: write_events. When enabled, new Calendo bookings are written to that calendar. Primary calendar gets the event by default.</td>
+    <td>Book a meeting. Verify event appears in your Google/Outlook calendar with correct title, time, attendees, and meeting link.</td>
+    <td>Ask AI: "Set my Outlook calendar as primary" → update_calendar_settings tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> calendar-settings-api.test.js<br><span class="test-badge tb-ai">AI</span> ai-tools-99.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Google Calendar Webhooks</td>
+    <td>Push notifications from Google when calendar events change. Watch channels renewed hourly via cron. Near-real-time conflict updates.</td>
+    <td>Create a Google Calendar event. Within a few minutes, verify Calendo reflects the new conflict (slot disappears).</td>
+    <td class="na">N/A — background sync</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> google-calendar-webhook.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Disconnect Calendar</td>
+    <td>Remove a connected calendar. Stops conflict checking and event writing for that account.</td>
+    <td>Click remove on a connected calendar. Confirm. Verify it's gone from the list. Verify conflicts from that calendar no longer block slots.</td>
+    <td class="na">N/A — destructive action, UI only</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> calendar.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Calendar View Dedup</td>
+    <td>Combined calendar view deduplicates Calendo bookings that also appear in Google/Outlook. Uses epoch-ms comparison to handle different timestamp formats (UTC vs offset).</td>
+    <td>Go to Calendar tab. Verify each Calendo booking appears once (green), not duplicated as a red Google event. Verify pure external events still appear.</td>
+    <td class="na">N/A — visual UI</td>
+    <td class="na">N/A</td>
+    <td><span class="test-badge tb-unit">Unit</span> calendar.test.js (4 dedup tests)</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Sync Error Surfacing</td>
+    <td>Calendar sync errors (expired tokens, API failures) are surfaced as warnings on the dashboard. Stored in calendar_sync_errors table.</td>
+    <td>If Outlook token expires, verify yellow warning appears on Calendar tab. Click to view error details.</td>
+    <td class="na">N/A — passive notification</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> outlook-token-refresh.test.js</td>
+  </tr>
+</table>
+
+
+<!-- ================================================================ -->
+<h2 id="notifications">7. Notifications &amp; Emails <span class="section-score">P1 High</span></h2>
+<!-- ================================================================ -->
+
+<p><strong>Why it exists:</strong> Email confirmations, reminders, and notifications are critical for meeting attendance. Without them, invitees forget meetings and hosts miss bookings.</p>
+
+<table>
+  <tr>
+    <th style="width:3%"></th>
+    <th style="width:16%">Feature</th>
+    <th style="width:22%">What &amp; Why</th>
+    <th style="width:20%">How to Test (UI)</th>
+    <th style="width:15%">How to Test (AI)</th>
+    <th style="width:6%">Calendly</th>
+    <th style="width:18%" class="test-cell">Automated Coverage</th>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Booking Confirmation Email</td>
+    <td>Sent to invitee + host on booking. Branded HTML with ICS attachment. Includes meeting link, cancel/reschedule links, booking details.</td>
+    <td>Book a meeting. Check invitee email — verify branded HTML, correct time/date, cancel/reschedule links, ICS attachment. Check host email — verify host notification.</td>
+    <td class="na">N/A — triggered by booking</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> email.test.js<br><span class="test-badge tb-e2e">E2E</span> integration/email.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Cancellation Email</td>
+    <td>Sent to invitee + host when booking is cancelled (by either party). Includes reason if provided.</td>
+    <td>Cancel a booking. Verify both parties receive cancellation email with correct details.</td>
+    <td class="na">N/A — triggered by cancel</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> email.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Reschedule Email</td>
+    <td>Sent when booking is rescheduled. Shows old and new times.</td>
+    <td>Reschedule a booking. Verify email shows both old and new time.</td>
+    <td class="na">N/A — triggered by reschedule</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> email.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>24-Hour Reminder Email</td>
+    <td>Sent 24 hours before meeting. Per-event-type toggle. Processed by cron every 5 minutes. Deduped via reminder_notifications table.</td>
+    <td>Book a meeting for ~24h from now. Wait for cron to run. Verify reminder email arrives. Verify no duplicate if cron runs again.</td>
+    <td class="na">N/A — cron-triggered</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> email.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>1-Hour Reminder Email</td>
+    <td>Same as 24h but sent 1 hour before. Separate per-event-type toggle.</td>
+    <td>Same as 24h test but verify 1h timing.</td>
+    <td class="na">N/A — cron-triggered</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> email.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>SMS Reminders (Twilio)</td>
+    <td>If invitee provides phone number and event type has SMS enabled. Sent alongside email reminders via cron.</td>
+    <td>Enable SMS on event type. Book with phone number. Verify SMS sent at reminder time (requires Twilio credentials).</td>
+    <td class="na">N/A — cron-triggered</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> conditional-sms.test.js, routing-sms-domain.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Guest Notification Emails</td>
+    <td>When invitee adds guests, each guest receives a notification email with meeting details and ICS.</td>
+    <td>Book with 2 guest emails. Verify each guest receives notification email.</td>
+    <td class="na">N/A — triggered by booking</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> booking-guests.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Reconfirmation Email</td>
+    <td>If reconfirmation enabled on event type, sent X hours before meeting. Contains link for invitee to confirm attendance.</td>
+    <td>Enable reconfirmation (e.g. 48h). Book a meeting. Verify reconfirmation email arrives at correct time. Click confirm link. Verify status updates in sidebar.</td>
+    <td class="na">N/A — cron-triggered</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> qr-reconfirm.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Slack Webhook Notifications</td>
+    <td>If Slack webhook URL configured, sends formatted messages on booking/cancel/reschedule events. Test button to verify connection.</td>
+    <td>Go to Settings → Integrations. Add Slack webhook URL. Click Test. Verify message appears in Slack channel. Book a meeting — verify Slack notification.</td>
+    <td>Ask AI: "Set up Slack notifications" or "Test my Slack webhook" → manage_slack tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> slack-email-verify.test.js<br><span class="test-badge tb-ai">AI</span> ai-tools-99.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Email Sequences</td>
+    <td>Automated email sequences triggered before/after booking or meeting. Template variables for personalization. CRUD in Settings → Advanced.</td>
+    <td>Create email sequence: "2 hours after meeting, send follow-up". Book and complete a meeting. Verify follow-up email sent at correct time.</td>
+    <td class="na">N/A — complex config, UI only</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-none">None</span></td>
+  </tr>
+</table>
+
+
+<!-- ================================================================ -->
+<h2 id="payments">8. Payments (Stripe &amp; PayPal) <span class="section-score">P1 High</span></h2>
+<!-- ================================================================ -->
+
+<p><strong>Why it exists:</strong> Paid bookings are a key revenue feature. Consultants, coaches, and freelancers charge per meeting. Broken payments = lost revenue for users.</p>
+
+<table>
+  <tr>
+    <th style="width:3%"></th>
+    <th style="width:16%">Feature</th>
+    <th style="width:22%">What &amp; Why</th>
+    <th style="width:20%">How to Test (UI)</th>
+    <th style="width:15%">How to Test (AI)</th>
+    <th style="width:6%">Calendly</th>
+    <th style="width:18%" class="test-cell">Automated Coverage</th>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Stripe Checkout for Bookings</td>
+    <td>When event type has price set, invitee is redirected to Stripe Checkout after selecting time. Booking confirmed only after successful payment.</td>
+    <td>Set price=$10 on event type. Book it. Verify redirect to Stripe. Use test card (4242...). Verify booking confirmed after payment. Verify confirmation page.</td>
+    <td class="na">N/A — invitee payment flow</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> payments.test.js, stripe-booking-ui.test.js<br><span class="test-badge tb-e2e">E2E</span> advanced-event-types.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Stripe Webhook Processing</td>
+    <td>Handles checkout.session.completed webhook. Verifies Stripe signature. Confirms booking and triggers all side effects (email, calendar event).</td>
+    <td>Complete a paid booking. Verify webhook processes correctly (booking status changes from pending to confirmed). Check Stripe dashboard for event delivery.</td>
+    <td class="na">N/A — system integration</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> payments.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Stripe Refunds</td>
+    <td>Host can refund a paid booking via the dashboard. Processes refund through Stripe API.</td>
+    <td>Cancel a paid booking. Click Refund button. Verify Stripe refund appears in Stripe dashboard. Verify booking status updated.</td>
+    <td class="na">N/A — requires Stripe context</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> payments.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Pro Subscription ($2/mo)</td>
+    <td>Stripe subscription for Pro features: remove branding badge, priority support. Managed via Stripe Customer Portal.</td>
+    <td>Click "Upgrade to Pro" in Settings → Advanced. Complete Stripe checkout. Verify Pro badge appears. Verify branding toggle works. Open Customer Portal — verify subscription management.</td>
+    <td>Ask AI: "Upgrade to Pro" → upgrade_to_pro tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> payments.test.js<br><span class="test-badge tb-ai">AI</span> ai-dashboard.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>PayPal Payments</td>
+    <td>Alternative to Stripe. BYOK PayPal credentials (client ID + secret). Creates PayPal order, captures on approval redirect. Supports sandbox and live modes.</td>
+    <td>Configure PayPal credentials in Settings → Integrations. Set price on event type. Book and pay via PayPal. Verify booking confirmed.</td>
+    <td>Ask AI: "Set up PayPal" → manage_paypal tool</td>
+    <td class="no">NO</td>
+    <td><span class="test-badge tb-unit">Unit</span> paypal-payments.test.js<br><span class="test-badge tb-ai">AI</span> ai-tools-99.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Coupon Codes</td>
+    <td>Discount codes for paid events. Fixed or percentage discount. Max uses, expiry date. Validated at booking time.</td>
+    <td>Create coupon "SAVE50" for 50% off. Book a paid event. Apply coupon — verify price updates. Complete booking — verify discounted charge.</td>
+    <td class="na">N/A — UI config only</td>
+    <td class="extra">EXTRA</td>
+    <td><span class="test-badge tb-e2e">E2E</span> booking-advanced.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Payment History</td>
+    <td>List of all payments received. Shows amount, date, invitee, status.</td>
+    <td>After some paid bookings, check payments list in dashboard. Verify amounts and statuses are correct.</td>
+    <td class="na">N/A — view only</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-none">None</span></td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Multi-Currency Support</td>
+    <td>Currency per event type (USD, EUR, GBP, etc.). Passed to Stripe/PayPal at checkout.</td>
+    <td>Set event type currency to EUR. Book it. Verify Stripe checkout shows EUR pricing.</td>
+    <td class="na">N/A — config field</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> payments.test.js</td>
+  </tr>
+</table>
+
+
+<!-- ================================================================ -->
+<h2 id="ai">9. AI Assistant <span class="section-score">P1 High</span></h2>
+<!-- ================================================================ -->
+
+<p><strong>Why it exists:</strong> AI is the core differentiator. The dashboard assistant lets hosts manage everything via natural language. The booking chatbot lets invitees schedule conversationally. If AI breaks, Calendo loses its edge.</p>
+
+<table>
+  <tr>
+    <th style="width:3%"></th>
+    <th style="width:16%">Feature</th>
+    <th style="width:22%">What &amp; Why</th>
+    <th style="width:20%">How to Test (UI)</th>
+    <th style="width:15%">How to Test (AI)</th>
+    <th style="width:6%">Calendly</th>
+    <th style="width:18%" class="test-cell">Automated Coverage</th>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Dashboard AI Assistant</td>
+    <td>Right-side panel on dashboard. Uses Claude Sonnet 4.6 with 34 tools for full account management. Chat history persisted. AI Mode toggle for full-screen.</td>
+    <td>Open AI panel. Ask "What's my booking link?" — verify correct URL. Ask "Show my upcoming meetings" — verify response. Ask "Create a 20-minute event called Quick Sync" — verify it's created.</td>
+    <td>This IS the AI testing surface. Test every tool via natural language.</td>
+    <td class="extra">EXTRA</td>
+    <td><span class="test-badge tb-unit">Unit</span> ai-dashboard.test.js, ai-new-tools.test.js, ai-tools-99.test.js<br><span class="test-badge tb-e2e">E2E</span> integration/ai-dashboard.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>AI: Read Operations</td>
+    <td>get_event_types, get_bookings, get_availability, get_booking_link, get_connected_calendars, get_settings, get_analytics, get_embed_code, get_audit_log, get_team_page_url</td>
+    <td class="na">N/A</td>
+    <td>Ask: "List my event types" / "Show my past bookings" / "What's my availability?" / "Show my analytics" / "Show my audit log"</td>
+    <td class="extra">EXTRA</td>
+    <td><span class="test-badge tb-ai">AI</span> ai-dashboard.test.js, ai-new-tools.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>AI: Write Operations</td>
+    <td>create_event_type, update_event_type, delete_event_type, cancel_booking, mark_no_show, add_booking_notes, update_settings, update_availability_schedule, create/delete_availability_schedule</td>
+    <td class="na">N/A</td>
+    <td>Ask: "Create a 45-min event called Consult" / "Cancel my meeting with John" / "Change my slug to ravi-scheduling" — verify changes in dashboard</td>
+    <td class="extra">EXTRA</td>
+    <td><span class="test-badge tb-ai">AI</span> ai-dashboard.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>AI: Availability Tools</td>
+    <td>update_date_overrides, update_holidays, set_meeting_limits, update_calendar_settings</td>
+    <td class="na">N/A</td>
+    <td>Ask: "Block April 25 from my schedule" / "Load US holidays" / "Set daily limit to 5" / "Turn off conflict checking for Outlook"</td>
+    <td class="extra">EXTRA</td>
+    <td><span class="test-badge tb-ai">AI</span> ai-tools-99.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>AI: Utility Tools</td>
+    <td>navigate_to, copy_to_clipboard, trigger_password_reset, submit_feedback, upgrade_to_pro, manage_tracking, manage_slack, manage_paypal, resend_verification</td>
+    <td class="na">N/A</td>
+    <td>Ask: "Go to Analytics" / "Copy my booking link" / "Set up Google Analytics with ID G-XXXXX" / "Submit feedback: love the AI feature"</td>
+    <td class="extra">EXTRA</td>
+    <td><span class="test-badge tb-ai">AI</span> ai-new-tools.test.js, ai-tools-99.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>AI Chat History Persistence</td>
+    <td>Conversation history saved to server (PUT /api/ai/chat-state) and restored on page reload. Clear button to reset.</td>
+    <td>Have a multi-message conversation with AI. Refresh page. Verify conversation is restored. Click Clear — verify it's gone.</td>
+    <td class="na">N/A</td>
+    <td class="extra">EXTRA</td>
+    <td><span class="test-badge tb-none">None</span></td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>AI: BYOK API Key</td>
+    <td>Users can bring their own Anthropic API key. Encrypted and stored. Used instead of platform key when set.</td>
+    <td>Go to Settings → Integrations. Enter your Anthropic API key. Save. Verify AI still works. Delete key — verify fallback to platform key.</td>
+    <td>Ask AI: "Set my AI API key to sk-ant-..." — should not work (security). Must use UI.</td>
+    <td class="extra">EXTRA</td>
+    <td><span class="test-badge tb-none">None</span></td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Public Booking AI Chatbot</td>
+    <td>Conversational booking on public booking page. Invitee describes when they want to meet. AI checks real availability and suggests times. Currently hidden (display:none).</td>
+    <td>Currently disabled. To test: remove display:none from AI chat div on booking page. Type "I need 30 minutes next Tuesday afternoon" — verify AI responds with available slots.</td>
+    <td class="na">N/A — invitee-facing</td>
+    <td class="extra">EXTRA</td>
+    <td><span class="test-badge tb-none">None</span></td>
+  </tr>
+</table>
+
+
+<!-- ================================================================ -->
+<h2 id="teams">10. Teams &amp; Organizations <span class="section-score">P2 Medium</span></h2>
+<!-- ================================================================ -->
+
+<p><strong>Why it exists:</strong> Enables multi-person scheduling for businesses. Round-robin distribution, collective availability, team booking pages, and member management.</p>
+
+<table>
+  <tr>
+    <th style="width:3%"></th>
+    <th style="width:16%">Feature</th>
+    <th style="width:22%">What &amp; Why</th>
+    <th style="width:20%">How to Test (UI)</th>
+    <th style="width:15%">How to Test (AI)</th>
+    <th style="width:6%">Calendly</th>
+    <th style="width:18%" class="test-cell">Automated Coverage</th>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Create Organization</td>
+    <td>Create a team/org with name and optional logo. Becomes the owner. Org gets a public team page.</td>
+    <td>Go to Team page. Click "Create Organization". Enter name. Verify org appears with you as owner.</td>
+    <td>Ask AI: "Get my team page URL" → get_team_page_url tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> team-audit.test.js<br><span class="test-badge tb-e2e">E2E</span> operations-reporting.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Invite Members</td>
+    <td>Invite users by email. They must have a Calendo account. Roles: owner, admin, member.</td>
+    <td>Invite a test user's email. Log in as that user — verify invitation appears. Accept. Verify member appears in org.</td>
+    <td class="na">N/A — requires cross-account flow</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> team-audit.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Round Robin Scheduling</td>
+    <td>Bookings auto-distributed among team members. Priority weighting, skip rules, daily caps, 30-day stats. Assigned via pickRoundRobinMember().</td>
+    <td>Create org event type with round-robin. Book 3 times. Verify each booking is assigned to different member (or weighted correctly).</td>
+    <td class="na">N/A — system logic</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> team-availability.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Collective Scheduling</td>
+    <td>Find times when ALL team members are available. Uses computeTeamAvailableSlots() to intersect individual availabilities.</td>
+    <td>Create org event type with collective mode. Verify booking page only shows slots where all members are free.</td>
+    <td class="na">N/A — system logic</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> team-availability.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Team Page</td>
+    <td>Public page at /team/ORG-SLUG showing all org members and their event types.</td>
+    <td>Visit /team/ORG-SLUG. Verify org name, members, and event types display. Click an event type — verify booking flow works.</td>
+    <td class="na">N/A — public page</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-e2e">E2E</span> operations-reporting.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Member Role Management</td>
+    <td>Owner can change roles (admin/member) and remove members. Admins can manage members but not change owner.</td>
+    <td>Change a member to admin. Verify they can now manage event types. Demote back. Remove a member — verify they can't access org.</td>
+    <td class="na">N/A — admin action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> team-audit.test.js</td>
+  </tr>
+</table>
+
+
+<!-- ================================================================ -->
+<h2 id="analytics">11. Analytics &amp; Reporting <span class="section-score">P2 Medium</span></h2>
+<!-- ================================================================ -->
+
+<p><strong>Why it exists:</strong> Hosts need to understand booking patterns, identify popular event types, track cancellation rates, and export data for reporting.</p>
+
+<table>
+  <tr>
+    <th style="width:3%"></th>
+    <th style="width:16%">Feature</th>
+    <th style="width:22%">What &amp; Why</th>
+    <th style="width:20%">How to Test (UI)</th>
+    <th style="width:15%">How to Test (AI)</th>
+    <th style="width:6%">Calendly</th>
+    <th style="width:18%" class="test-cell">Automated Coverage</th>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Analytics Dashboard</td>
+    <td>Stats cards: total bookings, this month, cancellation rate, no-show rate, most popular event type. Date range filter.</td>
+    <td>Go to Analytics tab. Verify stats cards show correct numbers. Change date range — verify numbers update.</td>
+    <td>Ask AI: "Show my analytics" → get_analytics tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> analytics-polls.test.js<br><span class="test-badge tb-e2e">E2E</span> analytics-admin.spec.js<br><span class="test-badge tb-ai">AI</span> ai-dashboard.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Daily Volume Chart</td>
+    <td>Bar chart showing bookings per day over selected date range. Visual trend indicator.</td>
+    <td>Verify chart renders with correct data points. Change date range — verify chart updates.</td>
+    <td class="na">N/A — visual chart</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-none">None</span></td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Event Type Breakdown</td>
+    <td>Shows booking count per event type, color-coded.</td>
+    <td>Verify each event type appears with correct booking count and matching color dot.</td>
+    <td class="na">N/A — visual breakdown</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-none">None</span></td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>CSV Export</td>
+    <td>Export bookings as CSV file with date range filter. Contains all booking details.</td>
+    <td>Click "Export CSV" in Analytics. Verify file downloads. Open CSV — verify column headers and data rows are correct.</td>
+    <td class="na">N/A — file download</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> analytics-polls.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Contacts List</td>
+    <td>All invitees who have ever booked. Searchable with filters (All, New in 30d, No upcoming). Shows name, email, booking count.</td>
+    <td>Go to Contacts tab. Verify invitees appear. Search by name. Filter by "New in 30 days" — verify only recent invitees show.</td>
+    <td class="na">N/A — view only</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-none">None</span></td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Audit Log</td>
+    <td>Chronological log of all account actions: login, create, update, delete, cancel, etc. Filterable and paginated.</td>
+    <td>Go to Settings → Tracking → Activity Log. Verify actions appear chronologically. Filter by type. Paginate through results.</td>
+    <td>Ask AI: "Show my recent audit log" → get_audit_log tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> team-audit.test.js<br><span class="test-badge tb-ai">AI</span> ai-new-tools.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Routing Form Analytics</td>
+    <td>Conversion analytics for routing forms: submissions, completions, drop-off rates.</td>
+    <td>Go to Routing Forms tab. Open analytics view. Verify conversion metrics show for forms with submissions.</td>
+    <td class="na">N/A — view only</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> analytics-polls.test.js</td>
+  </tr>
+</table>
+
+
+<!-- ================================================================ -->
+<h2 id="settings">12. Settings &amp; Branding <span class="section-score">P2 Medium</span></h2>
+<!-- ================================================================ -->
+
+<p><strong>Why it exists:</strong> Customization and branding let users make Calendo their own. Professional appearance builds trust with invitees.</p>
+
+<table>
+  <tr>
+    <th style="width:3%"></th>
+    <th style="width:16%">Feature</th>
+    <th style="width:22%">What &amp; Why</th>
+    <th style="width:20%">How to Test (UI)</th>
+    <th style="width:15%">How to Test (AI)</th>
+    <th style="width:6%">Calendly</th>
+    <th style="width:18%" class="test-cell">Automated Coverage</th>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Profile Settings</td>
+    <td>Display name, booking page slug, bio, welcome message, cancellation policy.</td>
+    <td>Go to Settings → Profile. Change display name and slug. Save. Verify booking page shows new name. Verify URL slug changed.</td>
+    <td>Ask AI: "Change my display name to Ravi K" or "Change my slug to ravik" → update_settings tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-e2e">E2E</span> settings.spec.js<br><span class="test-badge tb-ai">AI</span> ai-dashboard.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Brand Color</td>
+    <td>24 preset color swatches. Applied to booking page accent elements (buttons, links, calendar highlights).</td>
+    <td>Go to Settings → Branding. Click a color swatch. Save. Visit booking page — verify accent color changed.</td>
+    <td>Ask AI: "Set my brand color to blue" → update_settings tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-e2e">E2E</span> settings.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Logo URL</td>
+    <td>Custom logo displayed on booking page header. URL-based (no file upload).</td>
+    <td>Enter logo URL in Settings → Branding. Save. Visit booking page — verify logo appears.</td>
+    <td>Ask AI: "Set my logo to https://example.com/logo.png" → update_settings tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-e2e">E2E</span> settings.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Hide "Powered by Calendo"</td>
+    <td>Pro feature. Removes the branding badge from booking page footer.</td>
+    <td>Upgrade to Pro. Toggle off "Show Powered by Calendo". Visit booking page — verify badge is gone.</td>
+    <td class="na">N/A — toggle only</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-e2e">E2E</span> settings.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Blocked Emails</td>
+    <td>Newline-separated list of emails/domains to block from booking. Checked at booking time.</td>
+    <td>Add "block@test.com" to blocked list. Save. Try booking with that email — expect rejection.</td>
+    <td>Ask AI: "Block spammer@example.com" → update_settings tool</td>
+    <td class="extra">EXTRA</td>
+    <td><span class="test-badge tb-unit">Unit</span> review-regressions.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Google Analytics Integration</td>
+    <td>Enter GA Measurement ID. Injected into booking page for tracking visits, conversions.</td>
+    <td>Set GA ID in Settings → Tracking. Visit booking page. Verify GA script is injected (inspect page source).</td>
+    <td>Ask AI: "Set my Google Analytics ID to G-XXXXX" → manage_tracking tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> analytics-tracking.test.js<br><span class="test-badge tb-ai">AI</span> ai-new-tools.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Meta Pixel Integration</td>
+    <td>Enter Meta Pixel ID. Injected into booking page for Facebook/Instagram ad tracking.</td>
+    <td>Set Meta Pixel ID. Visit booking page. Verify pixel script is injected.</td>
+    <td>Ask AI: "Set my Meta Pixel to 123456" → manage_tracking tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> analytics-tracking.test.js<br><span class="test-badge tb-ai">AI</span> ai-new-tools.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>API Keys</td>
+    <td>Create API keys for programmatic access. Keys authenticate via X-API-Key header instead of session cookie.</td>
+    <td>Go to Settings → Integrations. Create API key. Copy it. Test with curl: <code>curl -H "X-API-Key: KEY" https://calendo.dev/api/event-types</code>. Verify response. Delete key — verify it stops working.</td>
+    <td class="na">N/A — developer feature</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-e2e">E2E</span> settings-integrations.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Delete Account</td>
+    <td>Permanently deletes account and all associated data (bookings, event types, calendars, etc.). Requires explicit confirmation.</td>
+    <td>Go to Settings → Advanced → Danger Zone. Click Delete Account. Type confirmation. Verify account is gone and login fails.</td>
+    <td>Ask AI: "Delete my account" → delete_account tool (asks confirmation)</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-ai">AI</span> ai-dashboard.test.js</td>
+  </tr>
+</table>
+
+
+<!-- ================================================================ -->
+<h2 id="embed">13. Embedding &amp; Distribution <span class="section-score">P2 Medium</span></h2>
+<!-- ================================================================ -->
+
+<p><strong>Why it exists:</strong> Embedding lets users put booking widgets on their own websites without sending visitors away. Critical for conversion optimization.</p>
+
+<table>
+  <tr>
+    <th style="width:3%"></th>
+    <th style="width:16%">Feature</th>
+    <th style="width:22%">What &amp; Why</th>
+    <th style="width:20%">How to Test (UI)</th>
+    <th style="width:15%">How to Test (AI)</th>
+    <th style="width:6%">Calendly</th>
+    <th style="width:18%" class="test-cell">Automated Coverage</th>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Inline Embed Widget</td>
+    <td>Embeds full booking page inside an iframe on any website. Script tag + container div. Responsive height.</td>
+    <td>Go to Settings → Branding → Embed. Copy inline embed code. Paste into a test HTML file. Open in browser — verify booking page loads inside the iframe.</td>
+    <td>Ask AI: "Get my inline embed code" → get_embed_code tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> embed-widgets.test.js (17 tests)<br><span class="test-badge tb-ai">AI</span> ai-new-tools.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Popup Embed Widget</td>
+    <td>Button that opens booking page in a modal overlay. Customizable button text and color.</td>
+    <td>Copy popup embed code. Add to test page. Click button — verify modal opens with booking page. Close modal — verify it closes cleanly.</td>
+    <td>Ask AI: "Get my popup embed code" → get_embed_code tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> embed-widgets.test.js<br><span class="test-badge tb-ai">AI</span> ai-new-tools.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Badge Embed Widget</td>
+    <td>Floating badge button (bottom-right corner) that opens booking modal. Always visible on host's website.</td>
+    <td>Copy badge embed code. Add to test page. Verify floating badge appears. Click — verify booking modal opens.</td>
+    <td>Ask AI: "Get my badge embed code" → get_embed_code tool</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> embed-widgets.test.js<br><span class="test-badge tb-ai">AI</span> ai-new-tools.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Embed Live Preview</td>
+    <td>Settings page shows live preview of each embed type so users can see what it looks like before copying code.</td>
+    <td>Open embed settings. Verify inline/popup/badge previews render correctly. Change brand color — verify preview updates.</td>
+    <td class="na">N/A — preview only</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-none">None</span></td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>QR Code</td>
+    <td>Auto-generated QR code linking to booking page. Displayed on Overview tab. Downloadable.</td>
+    <td>Go to Overview tab. Verify QR code renders. Scan with phone — verify it opens correct booking page URL.</td>
+    <td class="na">N/A — display only</td>
+    <td class="no">NO</td>
+    <td><span class="test-badge tb-unit">Unit</span> qr-reconfirm.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Single-Use Booking Links</td>
+    <td>Token-validated links with optional max uses and expiry. Useful for exclusive/limited access bookings.</td>
+    <td>Go to Settings → Advanced. Create single-use link with max_uses=1. Share link. Book once — works. Try again — verify rejection.</td>
+    <td class="na">N/A — UI config</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-none">None</span></td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>UTM Parameter Tracking</td>
+    <td>Booking page captures utm_source/medium/campaign/term/content from URL params. Stored on bookings for attribution.</td>
+    <td>Visit booking page with ?utm_source=linkedin&utm_campaign=spring. Complete booking. Check booking details — verify UTM params stored.</td>
+    <td class="na">N/A — passive capture</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> analytics-tracking.test.js</td>
+  </tr>
+</table>
+
+
+<!-- ================================================================ -->
+<h2 id="routing">14. Routing Forms <span class="section-score">P2 Medium</span></h2>
+<!-- ================================================================ -->
+
+<p><strong>Why it exists:</strong> Routing forms qualify leads before booking. Ask screening questions, then route to the right event type or team member based on answers. Calendly charges extra for this.</p>
+
+<table>
+  <tr>
+    <th style="width:3%"></th>
+    <th style="width:16%">Feature</th>
+    <th style="width:22%">What &amp; Why</th>
+    <th style="width:20%">How to Test (UI)</th>
+    <th style="width:15%">How to Test (AI)</th>
+    <th style="width:6%">Calendly</th>
+    <th style="width:18%" class="test-cell">Automated Coverage</th>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Create Routing Form</td>
+    <td>Named form with fields (text, dropdown, radio) and routing rules that map answers to event types.</td>
+    <td>Go to Routing Forms tab. Click "New Form". Add fields and rules. Save. Verify form appears in list.</td>
+    <td class="na">N/A — complex config</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> routing-sms-domain.test.js<br><span class="test-badge tb-e2e">E2E</span> routing-polls-compound.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Public Routing Form Page</td>
+    <td>Public page at /routing/?user=X&form=Y. Renders questions. On submit, routes to matched event type's booking page.</td>
+    <td>Visit the routing form URL. Fill out the form. Submit. Verify redirect to correct event type booking page.</td>
+    <td class="na">N/A — invitee-facing</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-e2e">E2E</span> routing-polls-compound.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Routing Rules Engine</td>
+    <td>Rules match field answers to event types. Supports equals, contains, and fallback/default routing.</td>
+    <td>Create form with dropdown "What do you need?" → "Quick question" routes to 15-min, "Deep dive" routes to 60-min. Test both paths.</td>
+    <td class="na">N/A — config-driven</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> routing-sms-domain.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Edit / Delete Routing Form</td>
+    <td>Full CRUD for routing forms. Changes take effect immediately.</td>
+    <td>Edit a routing form — change a field label. Save. Verify public page reflects change. Delete form — verify it's gone.</td>
+    <td class="na">N/A — UI action</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> routing-sms-domain.test.js</td>
+  </tr>
+</table>
+
+
+<!-- ================================================================ -->
+<h2 id="advanced">15. Advanced Features <span class="section-score">P3 Low</span></h2>
+<!-- ================================================================ -->
+
+<p><strong>Why it exists:</strong> Power-user features for specific use cases: polls for group decision-making, webhooks for automation, meeting polls, feedback system.</p>
+
+<table>
+  <tr>
+    <th style="width:3%"></th>
+    <th style="width:16%">Feature</th>
+    <th style="width:22%">What &amp; Why</th>
+    <th style="width:20%">How to Test (UI)</th>
+    <th style="width:15%">How to Test (AI)</th>
+    <th style="width:6%">Calendly</th>
+    <th style="width:18%" class="test-cell">Automated Coverage</th>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Meeting Polls</td>
+    <td>Propose multiple time options. Share poll link. Invitees vote (yes/maybe/no). Host finalizes best option. Creates booking from winner.</td>
+    <td>Go to Polls page. Create poll with 3 time options. Share link. Vote on each. Finalize — verify booking is created.</td>
+    <td class="na">N/A — separate page flow</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> analytics-polls.test.js<br><span class="test-badge tb-e2e">E2E</span> routing-polls-compound.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Webhooks</td>
+    <td>Register URLs to receive POST notifications on events: booking.created, booking.cancelled, booking.rescheduled. HMAC signature verification. 3 retries with exponential backoff.</td>
+    <td>Go to Settings → create webhook. Set URL and events. Book a meeting. Verify POST received at webhook URL with correct payload and signature header.</td>
+    <td class="na">N/A — developer feature</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> webhooks.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Feedback System</td>
+    <td>Users can submit feedback, bug reports, or feature requests. Stored in feedback table. Admin can view all submissions.</td>
+    <td>Click "Send Feedback" in sidebar. Fill form. Submit. Verify success toast. Log in as admin — verify feedback appears.</td>
+    <td>Ask AI: "Submit feedback: the color picker is great" → submit_feedback tool</td>
+    <td class="extra">EXTRA</td>
+    <td><span class="test-badge tb-ai">AI</span> ai-dashboard.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Video Conferencing Links</td>
+    <td>Auto-generated Google Meet, Zoom, or Teams links on booking. Google Meet via Calendar API, Zoom via server-to-server OAuth, Teams via Graph API.</td>
+    <td>Set event type location to "Google Meet". Book it. Verify Meet link in confirmation and calendar event. Repeat for Zoom (if configured).</td>
+    <td class="na">N/A — system integration</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> oauth-video-outlook.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Chrome Extension</td>
+    <td>Browser extension integration for quick scheduling. Extension communicates with Calendo API via API keys.</td>
+    <td>Install extension (if available). Verify it can authenticate and show event types. Quick-schedule from extension.</td>
+    <td class="na">N/A — extension</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> chrome-extension.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Slot Debug Endpoint</td>
+    <td>GET /api/slot-debug/:slug — explains why a specific time is unavailable. Useful for troubleshooting availability issues.</td>
+    <td>Call the API directly: /api/slot-debug/USERNAME?event=SLUG&date=2026-04-20&time=10:00. Verify response explains blocking reason.</td>
+    <td class="na">N/A — debug endpoint</td>
+    <td class="extra">EXTRA</td>
+    <td><span class="test-badge tb-none">None</span></td>
+  </tr>
+</table>
+
+
+<!-- ================================================================ -->
+<h2 id="admin">16. Admin &amp; Infrastructure <span class="section-score">P3 Low</span></h2>
+<!-- ================================================================ -->
+
+<p><strong>Why it exists:</strong> Platform-level features for monitoring, security, and operations. Less tested by end users but critical for platform health.</p>
+
+<table>
+  <tr>
+    <th style="width:3%"></th>
+    <th style="width:16%">Feature</th>
+    <th style="width:22%">What &amp; Why</th>
+    <th style="width:20%">How to Test (UI)</th>
+    <th style="width:15%">How to Test (AI)</th>
+    <th style="width:6%">Calendly</th>
+    <th style="width:18%" class="test-cell">Automated Coverage</th>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Admin Dashboard</td>
+    <td>Platform stats: total users, bookings today, active sessions, error rates. Accessible at /admin/.</td>
+    <td>Visit /admin/ as admin user. Verify stats display. Verify non-admin gets 403.</td>
+    <td class="na">N/A — admin only</td>
+    <td class="na">N/A</td>
+    <td><span class="test-badge tb-e2e">E2E</span> analytics-admin.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Admin User List</td>
+    <td>List all registered users with search. Shows name, email, plan, booking count, created date.</td>
+    <td>Visit admin user list. Search for a user. Verify data is correct.</td>
+    <td class="na">N/A — admin only</td>
+    <td class="na">N/A</td>
+    <td><span class="test-badge tb-e2e">E2E</span> analytics-admin.spec.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Rate Limiting</td>
+    <td>60 req/min per IP for public routes, 300 req/min per user for authenticated routes. In-memory store. Rate limit headers on all responses.</td>
+    <td>Send 61 rapid requests to a public endpoint. Verify 429 response on 61st. Check X-RateLimit-* headers.</td>
+    <td class="na">N/A — infrastructure</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-none">None</span></td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>CORS Configuration</td>
+    <td>Proper CORS headers for embedding and API access. Preflight (OPTIONS) handler returns allowed origins/methods/headers.</td>
+    <td>Make cross-origin fetch from a different domain. Verify CORS headers present. Verify OPTIONS preflight succeeds.</td>
+    <td class="na">N/A — infrastructure</td>
+    <td class="na">N/A</td>
+    <td><span class="test-badge tb-unit">Unit</span> api.test.js</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Session Cleanup Cron</td>
+    <td>Daily cron deletes expired sessions and API keys from database.</td>
+    <td>Check that old sessions are cleaned up (query D1 directly). Verify active sessions are not affected.</td>
+    <td class="na">N/A — background job</td>
+    <td class="na">N/A</td>
+    <td><span class="test-badge tb-none">None</span></td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Token Encryption</td>
+    <td>OAuth tokens (Google, Outlook) encrypted with AES-GCM before storage. ENCRYPTION_KEY env var. Random IV per encryption.</td>
+    <td>Connect a calendar. Query D1 — verify tokens are encrypted (not plaintext). Disconnect and reconnect — verify different ciphertext (random IV).</td>
+    <td class="na">N/A — security</td>
+    <td class="na">N/A</td>
+    <td><span class="test-badge tb-unit">Unit</span> calendar.test.js (3 encryption tests)</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Mobile Responsive Dashboard</td>
+    <td>Full responsive layout with breakpoints at 768px and 375px. Hamburger menu, touch-friendly tap targets (44px min), mobile AI FAB button, stacked layouts.</td>
+    <td>Open dashboard on mobile device (or use browser dev tools responsive mode). Verify: hamburger menu works, sidebar slides in/out, all tabs are usable, AI FAB button appears, forms are scrollable.</td>
+    <td class="na">N/A — visual layout</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> responsive-dashboard.test.js (26 tests)</td>
+  </tr>
+  <tr class="check-row">
+    <td><input type="checkbox"></td>
+    <td>Landing Page</td>
+    <td>Marketing page at calendo.dev. Hero, features, pricing, CTA. Links to register and login.</td>
+    <td>Visit calendo.dev. Verify page loads with correct branding. Click "Get Started" — verify redirect to register page. Verify all links work.</td>
+    <td class="na">N/A — static page</td>
+    <td class="yes">YES</td>
+    <td><span class="test-badge tb-unit">Unit</span> client/landing.test.js<br><span class="test-badge tb-e2e">E2E</span> full-lifecycle.spec.js</td>
+  </tr>
+</table>
+
+
+<!-- ================================================================ -->
+<h2 style="margin-top:60px; border-bottom-color:#7c3aed;">Appendix: Test Coverage Summary</h2>
+<!-- ================================================================ -->
+
+<table>
+  <tr>
+    <th>Test Type</th>
+    <th>File Count</th>
+    <th>Test Count</th>
+    <th>Key Files</th>
+  </tr>
+  <tr>
+    <td><span class="test-badge tb-unit">Unit Tests</span></td>
+    <td>41 files</td>
+    <td>769 tests (768 pass, 1 known failure)</td>
+    <td>tests/unit/worker/*.test.js, tests/unit/client/*.test.js</td>
+  </tr>
+  <tr>
+    <td><span class="test-badge tb-e2e">E2E Tests</span></td>
+    <td>18 spec files</td>
+    <td>~100+ scenarios</td>
+    <td>tests/e2e/*.spec.js, tests/e2e/integration/*.spec.js</td>
+  </tr>
+  <tr>
+    <td><span class="test-badge tb-smoke">Smoke Tests</span></td>
+    <td>1 script</td>
+    <td>~15 HTTP checks</td>
+    <td>scripts/smoke-local.mjs</td>
+  </tr>
+  <tr>
+    <td><span class="test-badge tb-ai">AI Tool Tests</span></td>
+    <td>3 files</td>
+    <td>~45 tests</td>
+    <td>ai-dashboard.test.js, ai-new-tools.test.js, ai-tools-99.test.js</td>
+  </tr>
+</table>
+
+<h3>Known Test Issues</h3>
+<ul>
+  <li><strong>1 known failure:</strong> <code>tests/unit/worker/slack-email-verify.test.js</code> — "marks email as verified with valid token" fails with HTML parsing error (pre-existing)</li>
+</ul>
+
+<h3>Coverage Gaps (No Automated Tests)</h3>
+<ul>
+  <li>Copy hours to other days (UI shortcut)</li>
+  <li>Email sequences (CRUD + triggered sending)</li>
+  <li>AI chat history persistence</li>
+  <li>BYOK AI API key</li>
+  <li>Embed live preview</li>
+  <li>Single-use booking links (end-to-end)</li>
+  <li>Payment history listing</li>
+  <li>Rate limiting (functional test)</li>
+  <li>Session cleanup cron</li>
+  <li>Slot debug endpoint</li>
+  <li>Daily volume chart rendering</li>
+  <li>Event type breakdown rendering</li>
+  <li>Contacts list</li>
+  <li>Calendar → Cancel auto-refresh (manual test only)</li>
+</ul>
+
+<hr style="margin-top: 60px;">
+<p class="timestamp">Complete document — all 16 sections finalized. 120+ test items across P0-P3 priority tiers. Use checkboxes to track progress during QA pass.</p>
+
+<script>
+(async () => {
+  const boxes = document.querySelectorAll('input[type="checkbox"]');
+  let state = {};
+  let saveTimer = null;
+
+  // Assign stable IDs based on position
+  boxes.forEach((cb, i) => cb.dataset.idx = i);
+
+  // Load state from server
+  try {
+    const res = await fetch('/api/checklist-state', { credentials: 'include' });
+    if (res.ok) {
+      const data = await res.json();
+      state = data.state || {};
+      boxes.forEach(cb => { if (state[cb.dataset.idx]) cb.checked = true; });
+    }
+  } catch {}
+
+  // Save state on change (debounced)
+  function saveState() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      try {
+        await fetch('/api/checklist-state', {
+          method: 'PUT', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ state })
+        });
+      } catch {}
+    }, 500);
+  }
+
+  boxes.forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) state[cb.dataset.idx] = true;
+      else delete state[cb.dataset.idx];
+      saveState();
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

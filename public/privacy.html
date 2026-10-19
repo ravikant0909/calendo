@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - Calendo</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="/apple-touch-icon.png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fff; color: #1a1a1a; line-height: 1.7; }
+    .container { max-width: 720px; margin: 0 auto; padding: 48px 24px; }
+    .logo { margin-bottom: 32px; }
+    .logo a { color: #2563eb; font-size: 24px; font-weight: 700; text-decoration: none; }
+    h1 { font-size: 28px; margin-bottom: 8px; }
+    .updated { color: #64748b; font-size: 14px; margin-bottom: 32px; }
+    h2 { font-size: 20px; margin-top: 32px; margin-bottom: 12px; }
+    p { margin-bottom: 16px; }
+    ul { margin-bottom: 16px; padding-left: 24px; }
+    li { margin-bottom: 8px; }
+    .summary { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 16px 20px; margin-bottom: 32px; font-size: 14px; color: #166534; }
+    .summary strong { color: #15803d; }
+    a { color: #2563eb; }
+  </style>
+  <!-- pwa-head -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Calendo">
+  <script src="/pwa.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <div class="logo"><a href="/">Calendo</a></div>
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: May 2026</p>
+
+    <div class="summary">
+      <strong>The short version:</strong> We collect the minimum data needed to make scheduling work (your name, email, calendar access). We don't sell it, we don't share it with advertisers, and we don't use it for anything other than Calendo.
+    </div>
+
+    <h2>What We Collect</h2>
+    <p>When you create a Calendo account, we collect:</p>
+    <ul>
+      <li><strong>Account information</strong>: your name, email address, and password (stored as a secure hash). If you sign in with Google, we receive your name, email, and profile picture from Google — we never see your Google password.</li>
+      <li><strong>Scheduling data</strong>: event types, availability preferences, and bookings you create or receive.</li>
+      <li><strong>Calendar data</strong>: if you connect a Google or Microsoft (Outlook) calendar, we read your existing calendar events so we can hide already-busy time slots from invitees, and we create, update, and delete events on your calendar that correspond to Calendo bookings. Details of exactly which Google and Microsoft data we touch, how long we keep it, and how to revoke access are in the next section.</li>
+    </ul>
+
+    <h2>When Others Book With You</h2>
+    <p>When an invitee books a meeting through your booking page, we collect their name and email. This data is stored to facilitate the booking and is visible to you as the host.</p>
+
+    <h2>How We Use Google Calendar Data</h2>
+    <p>If you connect Google Calendar, Calendo requests two OAuth scopes from Google: <code>https://www.googleapis.com/auth/calendar.readonly</code> and <code>https://www.googleapis.com/auth/calendar.events</code>. We use them only as follows.</p>
+    <ul>
+      <li><strong>Reading events (<code>calendar.readonly</code>):</strong> Calendo queries your calendar to find events that overlap with the time windows you've set as available. Overlapping events cause Calendo to mark those time slots as unavailable on your public booking page so invitees cannot double-book you. We may read event start/end times, status (confirmed / tentative / cancelled), and whether the event is marked as "free" or "busy." We do not display, index, or send event titles, descriptions, attendees, or attachments to any third party.</li>
+      <li><strong>Writing events (<code>calendar.events</code>):</strong> When an invitee books, reschedules, or cancels a meeting through Calendo, we create, update, or delete the corresponding event on your Google Calendar. The events we write contain the meeting title, invitee name and email, conference link, and any answers to your custom booking questions. We only modify events that Calendo itself created — we never edit or delete events created by you or any other application.</li>
+      <li><strong>Storage and retention:</strong> Calendo stores your Google OAuth access token and refresh token, encrypted at rest using AES-256-GCM. Calendar event contents fetched for conflict detection are held in memory only for the duration of a single availability query and are never written to durable storage. The events Calendo creates on your calendar are tracked in our database (by Google event ID) so we can later update or cancel them.</li>
+      <li><strong>No secondary use:</strong> Calendar data is not used to train or improve any AI or machine-learning model, to target advertising, to build profiles, or for any purpose unrelated to scheduling. It is not sold, rented, or shared with any party other than the Google APIs themselves.</li>
+      <li><strong>Revoking access:</strong> You can disconnect Google Calendar at any time from <em>Settings → Integrations</em> in Calendo — this deletes the stored tokens immediately. You can also revoke Calendo's access from your Google account at <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">myaccount.google.com/permissions</a>.</li>
+    </ul>
+    <p><strong>Limited Use compliance:</strong> Calendo's use and transfer of information received from Google APIs to any other app will adhere to the <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">Google API Services User Data Policy</a>, including the Limited Use requirements.</p>
+
+    <h2>How We Use Microsoft Calendar Data</h2>
+    <p>If you connect a Microsoft (Outlook) calendar, Calendo requests the following Microsoft Graph scopes: <code>offline_access</code>, <code>Calendars.ReadWrite</code>, and (for Teams meeting links) <code>OnlineMeetings.ReadWrite</code>. We use them in parallel to the Google flow above:</p>
+    <ul>
+      <li><strong>Calendars.ReadWrite</strong> lets Calendo read your existing Outlook events for conflict detection, and create, update, and cancel the events that correspond to Calendo bookings.</li>
+      <li><strong>OnlineMeetings.ReadWrite</strong> is used only to create a Microsoft Teams meeting link for bookings where you have chosen Teams as the location.</li>
+      <li><strong>offline_access</strong> allows Calendo to refresh the access token without prompting you to re-authenticate.</li>
+    </ul>
+    <p>Storage, retention, and secondary-use restrictions are identical to the Google section above. You can disconnect Microsoft from <em>Settings → Integrations</em>, or revoke Calendo's access in your Microsoft account at <a href="https://account.live.com/consent/Manage" target="_blank" rel="noopener">account.live.com/consent/Manage</a> (personal) or <a href="https://myapps.microsoft.com" target="_blank" rel="noopener">myapps.microsoft.com</a> (work / school).</p>
+
+    <h2>How We Use Your Data</h2>
+    <ul>
+      <li>To provide scheduling functionality (bookings, availability, reminders).</li>
+      <li>To send transactional emails (booking confirmations, reminders, cancellations).</li>
+      <li>To power the AI assistant (your scheduling data is sent to our AI provider to answer your questions and take actions).</li>
+      <li>To improve the service.</li>
+    </ul>
+    <p>We do <strong>not</strong> sell your data. We do <strong>not</strong> show you ads. We do <strong>not</strong> share your data with third parties except as needed to operate the service (e.g., email delivery, payment processing, AI processing).</p>
+
+    <h2>Third-Party Services</h2>
+    <ul>
+      <li><strong>Cloudflare</strong> — hosting, database, and content delivery</li>
+      <li><strong>Google / Microsoft</strong> — calendar sync and OAuth login</li>
+      <li><strong>Anthropic (Claude)</strong> — AI assistant processing</li>
+      <li><strong>Stripe</strong> — payment processing (Pro tier only)</li>
+    </ul>
+
+    <h2>Data Storage and Security</h2>
+    <p>Your data is stored on Cloudflare's global network using Cloudflare D1 (a serverless SQLite database). Data is encrypted in transit over HTTPS. OAuth access and refresh tokens for Google and Microsoft are encrypted at rest using AES-256-GCM with a key held outside the database. Calendar event contents fetched for conflict checking are kept only in memory for the duration of a single request — they are never written to D1 or any persistent log.</p>
+
+    <h2>Your Rights</h2>
+    <p>You can delete your Calendo account at any time from <em>Settings</em> or by asking the AI assistant. Deletion is permanent — all your data (event types, bookings, availability, stored calendar tokens) is removed immediately. There is no recovery.</p>
+    <p>To revoke just the calendar connection without deleting your Calendo account, disconnect it from <em>Settings → Integrations</em>, or revoke it directly with the provider: Google at <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">myaccount.google.com/permissions</a>, Microsoft at <a href="https://account.live.com/consent/Manage" target="_blank" rel="noopener">account.live.com/consent/Manage</a> or <a href="https://myapps.microsoft.com" target="_blank" rel="noopener">myapps.microsoft.com</a>.</p>
+
+    <h2>Cookies</h2>
+    <p>We use a single session cookie to keep you logged in. It is HTTP-only, secure, and same-site. We do not use tracking cookies, analytics cookies, or any third-party tracking scripts.</p>
+
+    <h2>Contact</h2>
+    <p>Calendo is built by one developer. For privacy questions, email <a href="mailto:ravikant0909@gmail.com">ravikant0909@gmail.com</a>.</p>
+  </div>
+</body>
+</html>

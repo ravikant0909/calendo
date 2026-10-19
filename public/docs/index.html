@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendo API Documentation</title>
+  <style>
+    /* ========== Reset & Base ========== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #fff; color: #1a1a1a; line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    :root {
+      --blue: #2563eb;
+      --blue-hover: #1d4ed8;
+      --blue-light: #eff6ff;
+      --blue-border: #bfdbfe;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      --green: #16a34a;
+      --green-light: #f0fdf4;
+      --green-border: #bbf7d0;
+      --orange: #ea580c;
+      --orange-light: #fff7ed;
+      --red: #dc2626;
+      --red-light: #fef2f2;
+      --purple: #7c3aed;
+      --purple-light: #f5f3ff;
+      --sidebar-width: 260px;
+    }
+
+    /* ========== Layout ========== */
+    .docs-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ========== Sidebar ========== */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--gray-50);
+      border-right: 1px solid var(--gray-200);
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      overflow-y: auto;
+      padding: 0;
+      z-index: 50;
+    }
+
+    .sidebar-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sidebar-header .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: -0.5px;
+    }
+
+    .sidebar-header .badge {
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--blue-light);
+      color: var(--blue);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .sidebar-nav {
+      padding: 16px 0;
+    }
+
+    .sidebar-section {
+      padding: 0 12px;
+      margin-bottom: 8px;
+    }
+
+    .sidebar-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--gray-400);
+      padding: 8px 12px 4px;
+    }
+
+    .sidebar-link {
+      display: block;
+      padding: 6px 12px;
+      font-size: 13px;
+      color: var(--gray-600);
+      border-radius: 6px;
+      transition: background 0.12s, color 0.12s;
+    }
+
+    .sidebar-link:hover {
+      background: var(--gray-200);
+      color: var(--gray-900);
+    }
+
+    .sidebar-link.active {
+      background: var(--blue-light);
+      color: var(--blue);
+      font-weight: 600;
+    }
+
+    .sidebar-back {
+      display: block;
+      padding: 12px 24px;
+      font-size: 13px;
+      color: var(--gray-500);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .sidebar-back:hover { color: var(--blue); }
+
+    /* ========== Main Content ========== */
+    .docs-content {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      padding: 40px 56px 80px;
+      max-width: 860px;
+    }
+
+    .docs-content h1 {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .docs-content h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-top: 56px;
+      margin-bottom: 16px;
+      padding-top: 24px;
+      border-top: 1px solid var(--gray-200);
+    }
+
+    .docs-content h2:first-of-type {
+      border-top: none;
+      margin-top: 32px;
+    }
+
+    .docs-content h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gray-800);
+      margin-top: 36px;
+      margin-bottom: 12px;
+    }
+
+    .docs-content h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gray-700);
+      margin-top: 24px;
+      margin-bottom: 8px;
+    }
+
+    .docs-content p {
+      font-size: 15px;
+      color: var(--gray-600);
+      margin-bottom: 16px;
+      line-height: 1.7;
+    }
+
+    .docs-content ul, .docs-content ol {
+      margin-bottom: 16px;
+      padding-left: 24px;
+    }
+
+    .docs-content li {
+      font-size: 15px;
+      color: var(--gray-600);
+      margin-bottom: 6px;
+      line-height: 1.7;
+    }
+
+    .docs-content > .lead {
+      font-size: 17px;
+      color: var(--gray-500);
+      margin-bottom: 32px;
+    }
+
+    /* ========== Inline code ========== */
+    .docs-content code {
+      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
+      font-size: 13px;
+      background: var(--gray-100);
+      color: var(--gray-800);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* ========== Code Blocks ========== */
+    .code-block {
+      position: relative;
+      margin-bottom: 24px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--gray-200);
+    }
+
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 8px 16px;
+    }
+
+    .code-block-lang {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .code-block-copy {
+      background: none;
+      border: 1px solid var(--gray-300);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 12px;
+      color: var(--gray-500);
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .code-block-copy:hover {
+      background: var(--gray-100);
+      color: var(--gray-700);
+    }
+
+    .code-block pre {
+      margin: 0;
+      padding: 16px;
+      overflow-x: auto;
+      background: #fff;
+    }
+
+    .code-block pre code {
+      background: none;
+      padding: 0;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--gray-800);
+    }
+
+    /* Syntax highlighting */
+    .code-block .kw { color: #7c3aed; }
+    .code-block .str { color: #16a34a; }
+    .code-block .num { color: #ea580c; }
+    .code-block .cmt { color: var(--gray-400); font-style: italic; }
+    .code-block .url { color: var(--blue); }
+
+    /* ========== Method badges ========== */
+    .method {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    .method-get { background: var(--green-light); color: var(--green); border: 1px solid var(--green-border); }
+    .method-post { background: var(--blue-light); color: var(--blue); border: 1px solid var(--blue-border); }
+    .method-put { background: var(--orange-light); color: var(--orange); border: 1px solid #fed7aa; }
+    .method-delete { background: var(--red-light); color: var(--red); border: 1px solid #fecaca; }
+
+    /* ========== Endpoint Cards ========== */
+    .endpoint {
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .endpoint-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .endpoint-header:hover { background: var(--gray-100); }
+
+    .endpoint-path {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gray-800);
+    }
+
+    .endpoint-desc {
+      font-size: 13px;
+      color: var(--gray-500);
+      margin-left: auto;
+    }
+
+    .endpoint-toggle {
+      color: var(--gray-400);
+      font-size: 12px;
+      transition: transform 0.2s;
+    }
+
+    .endpoint.open .endpoint-toggle { transform: rotate(90deg); }
+
+    .endpoint-body {
+      display: none;
+      padding: 20px;
+    }
+
+    .endpoint.open .endpoint-body { display: block; }
+
+    .endpoint-body p {
+      font-size: 14px;
+    }
+
+    /* ========== Tables ========== */
+    .docs-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    .docs-table th {
+      text-align: left;
+      padding: 10px 16px;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      font-weight: 600;
+      color: var(--gray-700);
+      font-size: 13px;
+    }
+
+    .docs-table td {
+      padding: 10px 16px;
+      border: 1px solid var(--gray-200);
+      color: var(--gray-600);
+      vertical-align: top;
+    }
+
+    .docs-table td code {
+      font-size: 12px;
+    }
+
+    /* ========== Callouts ========== */
+    .callout {
+      padding: 16px 20px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .callout-info {
+      background: var(--blue-light);
+      border: 1px solid var(--blue-border);
+      color: var(--gray-700);
+    }
+
+    .callout-warn {
+      background: var(--orange-light);
+      border: 1px solid #fed7aa;
+      color: var(--gray-700);
+    }
+
+    .callout-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    /* ========== Mobile ========== */
+    .mobile-menu-btn {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    @media (max-width: 900px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.25s;
+        z-index: 200;
+      }
+      .sidebar.open { transform: translateX(0); }
+
+      .docs-content {
+        margin-left: 0;
+        padding: 32px 24px 80px;
+      }
+
+      .mobile-menu-btn { display: flex; align-items: center; justify-content: center; }
+
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.4);
+        z-index: 199;
+      }
+
+      .sidebar-overlay.open { display: block; }
+    }
+  </style>
+  <!-- pwa-head -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Calendo">
+  <script src="/pwa.js" defer></script>
+</head>
+<body>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <a href="/" class="sidebar-back">&#8592; Back to Calendo</a>
+      <div class="sidebar-header">
+        <span class="logo">API Docs</span>
+        <span class="badge">v1</span>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Getting Started</div>
+          <a href="#introduction" class="sidebar-link active">Introduction</a>
+          <a href="#authentication" class="sidebar-link">Authentication</a>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Endpoints</div>
+          <a href="#auth-endpoints" class="sidebar-link">Auth</a>
+          <a href="#event-types" class="sidebar-link">Event Types</a>
+          <a href="#availability" class="sidebar-link">Availability</a>
+          <a href="#bookings" class="sidebar-link">Bookings</a>
+          <a href="#booking-page" class="sidebar-link">Booking Page</a>
+          <a href="#webhooks-endpoints" class="sidebar-link">Webhooks</a>
+          <a href="#ai-chat" class="sidebar-link">AI Chat</a>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Reference</div>
+          <a href="#webhooks" class="sidebar-link">Webhook Events</a>
+          <a href="#rate-limits" class="sidebar-link">Rate Limits</a>
+          <a href="#errors" class="sidebar-link">Errors</a>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Guides</div>
+          <a href="/docs/embed.html" class="sidebar-link">Embed Widget</a>
+        </div>
+      </nav>
+    </aside>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Main Content -->
+    <main class="docs-content">
+
+      <!-- Introduction -->
+      <h1 id="introduction">Calendo API</h1>
+      <p class="lead">The Calendo API lets you integrate scheduling into your applications. Create event types, manage availability, handle bookings, and build custom scheduling workflows.</p>
+
+      <h3>Base URL</h3>
+      <div class="code-block">
+        <div class="code-block-header"><span class="code-block-lang">URL</span></div>
+        <pre><code>https://calendo.dev/api</code></pre>
+      </div>
+
+      <h3>Content Type</h3>
+      <p>All requests and responses use JSON. Set the <code>Content-Type</code> header to <code>application/json</code> for all requests with a body.</p>
+
+      <h3>Request Format</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">curl</span>
+          <button class="code-block-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>curl https://calendo.dev/api/event-types \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span></code></pre>
+      </div>
+
+      <!-- Authentication -->
+      <h2 id="authentication">Authentication</h2>
+      <p>Calendo supports two authentication methods. Use whichever fits your use case.</p>
+
+      <h3>Session Cookies (Browser)</h3>
+      <p>When you log in via <code>POST /api/auth/login</code>, the response sets a secure HTTP-only session cookie. All subsequent requests from the browser automatically include this cookie. This is the recommended method for browser-based applications.</p>
+
+      <h3>API Keys (Programmatic Access)</h3>
+      <p>For server-to-server integrations, use API keys. Include your key in the <code>X-API-Key</code> header.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">curl</span>
+          <button class="code-block-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>curl https://calendo.dev/api/event-types \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span></code></pre>
+      </div>
+
+      <h4>Creating API Keys</h4>
+      <p>You can create API keys from your Calendo dashboard under <strong>Settings &gt; API Keys</strong>. Each key can be given a label and optional expiration date. Store your key securely -- it is only shown once at creation time.</p>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Note</div>
+        Public endpoints (booking, availability lookup, AI chat) do not require authentication.
+      </div>
+
+      <!-- Auth Endpoints -->
+      <h2 id="auth-endpoints">Auth</h2>
+
+      <div class="endpoint open">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/api/auth/register</span>
+          <span class="endpoint-desc">Create a new account</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Register a new Calendo user. Creates a default booking page and availability schedule.</p>
+          <h4>Request Body</h4>
+          <table class="docs-table">
+            <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+            <tr><td><code>email</code></td><td>string</td><td>Yes</td><td>User's email address</td></tr>
+            <tr><td><code>password</code></td><td>string</td><td>Yes</td><td>Minimum 8 characters</td></tr>
+            <tr><td><code>name</code></td><td>string</td><td>Yes</td><td>User's display name</td></tr>
+          </table>
+          <h4>Response</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">json</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>{
+  <span class="str">"user"</span>: {
+    <span class="str">"id"</span>: <span class="num">1</span>,
+    <span class="str">"email"</span>: <span class="str">"you@example.com"</span>,
+    <span class="str">"name"</span>: <span class="str">"Jane Smith"</span>,
+    <span class="str">"timezone"</span>: <span class="str">"America/Los_Angeles"</span>,
+    <span class="str">"created_at"</span>: <span class="str">"2026-03-07 10:00:00"</span>
+  },
+  <span class="str">"bookingSlug"</span>: <span class="str">"jane-smith"</span>
+}</code></pre>
+          </div>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl -X POST https://calendo.dev/api/auth/register \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -d <span class="str">'{
+    "email": "you@example.com",
+    "password": "securepass123",
+    "name": "Jane Smith"
+  }'</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/api/auth/login</span>
+          <span class="endpoint-desc">Log in to an existing account</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Authenticate with email and password. Returns a session cookie.</p>
+          <h4>Request Body</h4>
+          <table class="docs-table">
+            <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+            <tr><td><code>email</code></td><td>string</td><td>Yes</td><td>User's email address</td></tr>
+            <tr><td><code>password</code></td><td>string</td><td>Yes</td><td>User's password</td></tr>
+          </table>
+          <h4>Response</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">json</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>{
+  <span class="str">"user"</span>: {
+    <span class="str">"id"</span>: <span class="num">1</span>,
+    <span class="str">"email"</span>: <span class="str">"you@example.com"</span>,
+    <span class="str">"name"</span>: <span class="str">"Jane Smith"</span>,
+    <span class="str">"timezone"</span>: <span class="str">"America/Los_Angeles"</span>
+  }
+}</code></pre>
+          </div>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl -X POST https://calendo.dev/api/auth/login \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -d <span class="str">'{"email": "you@example.com", "password": "securepass123"}'</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/api/auth/logout</span>
+          <span class="endpoint-desc">End session</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Log out and destroy the current session. Requires authentication.</p>
+          <h4>Response</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">json</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>{ <span class="str">"ok"</span>: <span class="kw">true</span> }</code></pre>
+          </div>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl -X POST https://calendo.dev/api/auth/logout \
+  -H <span class="str">"Cookie: session=your_session_token"</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-get">GET</span>
+          <span class="endpoint-path">/api/auth/me</span>
+          <span class="endpoint-desc">Get current user</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Returns the currently authenticated user's profile. Requires authentication.</p>
+          <h4>Response</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">json</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>{
+  <span class="str">"id"</span>: <span class="num">1</span>,
+  <span class="str">"email"</span>: <span class="str">"you@example.com"</span>,
+  <span class="str">"name"</span>: <span class="str">"Jane Smith"</span>,
+  <span class="str">"timezone"</span>: <span class="str">"America/Los_Angeles"</span>,
+  <span class="str">"avatar_url"</span>: <span class="kw">null</span>,
+  <span class="str">"created_at"</span>: <span class="str">"2026-03-07 10:00:00"</span>
+}</code></pre>
+          </div>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl https://calendo.dev/api/auth/me \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event Types -->
+      <h2 id="event-types">Event Types</h2>
+      <p>Event types are bookable meeting templates. Each event type has a name, duration, and slug used in booking URLs.</p>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-get">GET</span>
+          <span class="endpoint-path">/api/event-types</span>
+          <span class="endpoint-desc">List all event types</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Returns all active event types for the authenticated user.</p>
+          <h4>Response</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">json</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>[
+  {
+    <span class="str">"id"</span>: <span class="num">1</span>,
+    <span class="str">"name"</span>: <span class="str">"30 Minute Call"</span>,
+    <span class="str">"slug"</span>: <span class="str">"30-minute-call"</span>,
+    <span class="str">"duration_minutes"</span>: <span class="num">30</span>,
+    <span class="str">"color"</span>: <span class="str">"#0069ff"</span>,
+    <span class="str">"description"</span>: <span class="str">"A quick intro call"</span>,
+    <span class="str">"is_active"</span>: <span class="num">1</span>
+  }
+]</code></pre>
+          </div>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl https://calendo.dev/api/event-types \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/api/event-types</span>
+          <span class="endpoint-desc">Create an event type</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Create a new bookable event type.</p>
+          <h4>Request Body</h4>
+          <table class="docs-table">
+            <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+            <tr><td><code>name</code></td><td>string</td><td>Yes</td><td>Event type name</td></tr>
+            <tr><td><code>duration_minutes</code></td><td>integer</td><td>No</td><td>Duration in minutes (5-720, default: 30)</td></tr>
+            <tr><td><code>description</code></td><td>string</td><td>No</td><td>Description shown on booking page</td></tr>
+            <tr><td><code>color</code></td><td>string</td><td>No</td><td>Hex color (default: #0069ff)</td></tr>
+            <tr><td><code>location_type</code></td><td>string</td><td>No</td><td>google_meet, zoom, phone, custom</td></tr>
+            <tr><td><code>questions</code></td><td>array</td><td>No</td><td>Custom questions for invitees</td></tr>
+            <tr><td><code>is_secret</code></td><td>boolean</td><td>No</td><td>Hidden from booking page listing</td></tr>
+            <tr><td><code>requires_confirmation</code></td><td>boolean</td><td>No</td><td>Require host confirmation</td></tr>
+            <tr><td><code>buffer_before</code></td><td>integer</td><td>No</td><td>Buffer time before in minutes</td></tr>
+            <tr><td><code>buffer_after</code></td><td>integer</td><td>No</td><td>Buffer time after in minutes</td></tr>
+            <tr><td><code>min_notice_hours</code></td><td>integer</td><td>No</td><td>Minimum scheduling notice (default: 4)</td></tr>
+            <tr><td><code>max_future_days</code></td><td>integer</td><td>No</td><td>How far in advance to allow booking (default: 60)</td></tr>
+          </table>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl -X POST https://calendo.dev/api/event-types \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span> \
+  -d <span class="str">'{
+    "name": "30 Minute Call",
+    "duration_minutes": 30,
+    "description": "A quick intro call",
+    "color": "#0069ff"
+  }'</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-get">GET</span>
+          <span class="endpoint-path">/api/event-types/:id</span>
+          <span class="endpoint-desc">Get a single event type</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Retrieve a specific event type by ID.</p>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl https://calendo.dev/api/event-types/1 \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-put">PUT</span>
+          <span class="endpoint-path">/api/event-types/:id</span>
+          <span class="endpoint-desc">Update an event type</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Update any fields on an existing event type. Only include fields you want to change.</p>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl -X PUT https://calendo.dev/api/event-types/1 \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span> \
+  -d <span class="str">'{"duration_minutes": 45, "description": "Extended intro call"}'</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-delete">DELETE</span>
+          <span class="endpoint-path">/api/event-types/:id</span>
+          <span class="endpoint-desc">Delete an event type</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Soft-deletes an event type (sets <code>is_active = 0</code>). The event type will no longer appear on your booking page.</p>
+          <h4>Response</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">json</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>{ <span class="str">"ok"</span>: <span class="kw">true</span> }</code></pre>
+          </div>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl -X DELETE https://calendo.dev/api/event-types/1 \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Availability -->
+      <h2 id="availability">Availability</h2>
+      <p>Manage availability schedules (when you are open for bookings) and look up available slots for a specific user's event type.</p>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-get">GET</span>
+          <span class="endpoint-path">/api/availability-schedules</span>
+          <span class="endpoint-desc">List availability schedules</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Returns all availability schedules for the authenticated user. Requires authentication.</p>
+          <h4>Response</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">json</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>[
+  {
+    <span class="str">"id"</span>: <span class="num">1</span>,
+    <span class="str">"name"</span>: <span class="str">"Working Hours"</span>,
+    <span class="str">"timezone"</span>: <span class="str">"America/Los_Angeles"</span>,
+    <span class="str">"rules"</span>: <span class="str">"[{\"day\":1,\"start\":\"09:00\",\"end\":\"17:00\"}, ...]"</span>,
+    <span class="str">"is_default"</span>: <span class="num">1</span>
+  }
+]</code></pre>
+          </div>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl https://calendo.dev/api/availability-schedules \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/api/availability-schedules</span>
+          <span class="endpoint-desc">Create availability schedule</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Create a new availability schedule. Requires authentication.</p>
+          <h4>Request Body</h4>
+          <table class="docs-table">
+            <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+            <tr><td><code>name</code></td><td>string</td><td>Yes</td><td>Schedule name</td></tr>
+            <tr><td><code>timezone</code></td><td>string</td><td>No</td><td>IANA timezone (default: America/Los_Angeles)</td></tr>
+            <tr><td><code>rules</code></td><td>array</td><td>No</td><td>Weekly recurring rules: <code>[{day, start, end}]</code></td></tr>
+            <tr><td><code>overrides</code></td><td>array</td><td>No</td><td>Date-specific overrides</td></tr>
+            <tr><td><code>is_default</code></td><td>boolean</td><td>No</td><td>Set as default schedule</td></tr>
+          </table>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl -X POST https://calendo.dev/api/availability-schedules \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span> \
+  -d <span class="str">'{
+    "name": "Evening Hours",
+    "timezone": "America/New_York",
+    "rules": [
+      {"day": 1, "start": "18:00", "end": "21:00"},
+      {"day": 3, "start": "18:00", "end": "21:00"}
+    ]
+  }'</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-get">GET</span>
+          <span class="endpoint-path">/api/availability/:username/:event-slug</span>
+          <span class="endpoint-desc">Get available time slots (public)</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Returns available time slots for a user's event type within a date range. No authentication required.</p>
+          <h4>Query Parameters</h4>
+          <table class="docs-table">
+            <tr><th>Param</th><th>Type</th><th>Required</th><th>Description</th></tr>
+            <tr><td><code>start</code></td><td>string</td><td>Yes</td><td>Start date (YYYY-MM-DD)</td></tr>
+            <tr><td><code>end</code></td><td>string</td><td>Yes</td><td>End date (YYYY-MM-DD)</td></tr>
+            <tr><td><code>timezone</code></td><td>string</td><td>No</td><td>Invitee timezone (default: UTC)</td></tr>
+          </table>
+          <h4>Response</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">json</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>{
+  <span class="str">"slots"</span>: {
+    <span class="str">"2026-03-10"</span>: [<span class="str">"09:00"</span>, <span class="str">"09:30"</span>, <span class="str">"10:00"</span>, <span class="str">"10:30"</span>, <span class="str">"..."</span>],
+    <span class="str">"2026-03-11"</span>: [<span class="str">"09:00"</span>, <span class="str">"09:30"</span>, <span class="str">"10:00"</span>, <span class="str">"..."</span>]
+  }
+}</code></pre>
+          </div>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl <span class="str">"https://calendo.dev/api/availability/jane-smith/30-minute-call?start=2026-03-10&end=2026-03-14&timezone=America/New_York"</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bookings -->
+      <h2 id="bookings">Bookings</h2>
+      <p>Create and manage bookings. Invitees can book through the public endpoint; hosts manage bookings through authenticated endpoints.</p>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-get">GET</span>
+          <span class="endpoint-path">/api/bookings</span>
+          <span class="endpoint-desc">List bookings</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Returns all bookings for the authenticated user, ordered by start time descending. Requires authentication.</p>
+          <h4>Response</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">json</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>[
+  {
+    <span class="str">"id"</span>: <span class="num">1</span>,
+    <span class="str">"event_type_name"</span>: <span class="str">"30 Minute Call"</span>,
+    <span class="str">"invitee_name"</span>: <span class="str">"Bob Johnson"</span>,
+    <span class="str">"invitee_email"</span>: <span class="str">"bob@example.com"</span>,
+    <span class="str">"start_time"</span>: <span class="str">"2026-03-10 14:00:00"</span>,
+    <span class="str">"end_time"</span>: <span class="str">"2026-03-10 14:30:00"</span>,
+    <span class="str">"status"</span>: <span class="str">"confirmed"</span>,
+    <span class="str">"duration_minutes"</span>: <span class="num">30</span>
+  }
+]</code></pre>
+          </div>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl https://calendo.dev/api/bookings \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/api/book/:username/:event-slug</span>
+          <span class="endpoint-desc">Create a booking (public)</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Book a time slot with a user. No authentication required -- this is the public booking endpoint used by invitees.</p>
+          <h4>Request Body</h4>
+          <table class="docs-table">
+            <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+            <tr><td><code>name</code></td><td>string</td><td>Yes</td><td>Invitee's name</td></tr>
+            <tr><td><code>email</code></td><td>string</td><td>Yes</td><td>Invitee's email</td></tr>
+            <tr><td><code>timezone</code></td><td>string</td><td>No</td><td>Invitee's timezone (default: UTC)</td></tr>
+            <tr><td><code>start_time</code></td><td>string</td><td>Yes</td><td>ISO 8601 datetime of the slot</td></tr>
+            <tr><td><code>answers</code></td><td>object</td><td>No</td><td>Answers to custom questions</td></tr>
+          </table>
+          <h4>Response (201)</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">json</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>{
+  <span class="str">"booking"</span>: {
+    <span class="str">"uid"</span>: <span class="str">"a1b2c3d4-..."</span>,
+    <span class="str">"event_name"</span>: <span class="str">"30 Minute Call"</span>,
+    <span class="str">"invitee_name"</span>: <span class="str">"Bob Johnson"</span>,
+    <span class="str">"invitee_email"</span>: <span class="str">"bob@example.com"</span>,
+    <span class="str">"start_time"</span>: <span class="str">"2026-03-10 14:00:00"</span>,
+    <span class="str">"end_time"</span>: <span class="str">"2026-03-10 14:30:00"</span>,
+    <span class="str">"status"</span>: <span class="str">"confirmed"</span>,
+    <span class="str">"timezone"</span>: <span class="str">"America/New_York"</span>
+  }
+}</code></pre>
+          </div>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl -X POST https://calendo.dev/api/book/jane-smith/30-minute-call \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -d <span class="str">'{
+    "name": "Bob Johnson",
+    "email": "bob@example.com",
+    "timezone": "America/New_York",
+    "start_time": "2026-03-10T19:00:00Z"
+  }'</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/api/bookings/:id/cancel</span>
+          <span class="endpoint-desc">Cancel a booking</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Cancel an existing booking. Requires authentication (host only).</p>
+          <h4>Response</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">json</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>{ <span class="str">"ok"</span>: <span class="kw">true</span> }</code></pre>
+          </div>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl -X POST https://calendo.dev/api/bookings/1/cancel \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking Page -->
+      <h2 id="booking-page">Booking Page</h2>
+      <p>Each user has a public booking page with a unique slug. Manage your booking page settings.</p>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-get">GET</span>
+          <span class="endpoint-path">/api/booking-page</span>
+          <span class="endpoint-desc">Get your booking page</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Retrieve your booking page settings. Requires authentication.</p>
+          <h4>Response</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">json</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>{
+  <span class="str">"id"</span>: <span class="num">1</span>,
+  <span class="str">"slug"</span>: <span class="str">"jane-smith"</span>,
+  <span class="str">"display_name"</span>: <span class="str">"Jane Smith"</span>,
+  <span class="str">"bio"</span>: <span class="str">"Product Designer at Acme"</span>,
+  <span class="str">"brand_color"</span>: <span class="str">"#2563eb"</span>,
+  <span class="str">"welcome_message"</span>: <span class="str">"Pick a time that works for you!"</span>
+}</code></pre>
+          </div>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl https://calendo.dev/api/booking-page \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-put">PUT</span>
+          <span class="endpoint-path">/api/booking-page</span>
+          <span class="endpoint-desc">Update your booking page</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Update booking page settings. Requires authentication. Only include fields you want to change.</p>
+          <h4>Request Body</h4>
+          <table class="docs-table">
+            <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+            <tr><td><code>display_name</code></td><td>string</td><td>Name shown on booking page</td></tr>
+            <tr><td><code>bio</code></td><td>string</td><td>Short bio/description</td></tr>
+            <tr><td><code>brand_color</code></td><td>string</td><td>Hex color for branding</td></tr>
+            <tr><td><code>welcome_message</code></td><td>string</td><td>Message shown to invitees</td></tr>
+            <tr><td><code>slug</code></td><td>string</td><td>URL slug (must be unique)</td></tr>
+          </table>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl -X PUT https://calendo.dev/api/booking-page \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span> \
+  -d <span class="str">'{"bio": "Product Designer at Acme", "brand_color": "#7c3aed"}'</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Webhooks Endpoints -->
+      <h2 id="webhooks-endpoints">Webhooks</h2>
+      <p>Register webhook URLs to receive real-time notifications about booking events.</p>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-get">GET</span>
+          <span class="endpoint-path">/api/webhooks</span>
+          <span class="endpoint-desc">List webhooks</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Returns all registered webhooks for the authenticated user.</p>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl https://calendo.dev/api/webhooks \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/api/webhooks</span>
+          <span class="endpoint-desc">Create a webhook</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Register a new webhook URL.</p>
+          <h4>Request Body</h4>
+          <table class="docs-table">
+            <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+            <tr><td><code>url</code></td><td>string</td><td>Yes</td><td>Webhook endpoint URL (HTTPS)</td></tr>
+            <tr><td><code>events</code></td><td>array</td><td>Yes</td><td>Events to subscribe to</td></tr>
+            <tr><td><code>secret</code></td><td>string</td><td>No</td><td>Signing secret for verification</td></tr>
+          </table>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl -X POST https://calendo.dev/api/webhooks \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span> \
+  -d <span class="str">'{
+    "url": "https://your-app.com/webhooks/calendo",
+    "events": ["booking.created", "booking.cancelled"],
+    "secret": "whsec_your_secret"
+  }'</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-put">PUT</span>
+          <span class="endpoint-path">/api/webhooks/:id</span>
+          <span class="endpoint-desc">Update a webhook</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Update an existing webhook's URL, events, or secret.</p>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl -X PUT https://calendo.dev/api/webhooks/1 \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span> \
+  -d <span class="str">'{"events": ["booking.created", "booking.cancelled", "booking.rescheduled"]}'</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-delete">DELETE</span>
+          <span class="endpoint-path">/api/webhooks/:id</span>
+          <span class="endpoint-desc">Delete a webhook</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Remove a registered webhook.</p>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl -X DELETE https://calendo.dev/api/webhooks/1 \
+  -H <span class="str">"X-API-Key: cal_your_api_key"</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Chat -->
+      <h2 id="ai-chat">AI Chat</h2>
+      <p>The AI chat endpoint powers conversational booking on your booking page. Invitees can describe their scheduling needs in natural language.</p>
+
+      <div class="endpoint">
+        <div class="endpoint-header" onclick="this.parentElement.classList.toggle('open')">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/api/ai/chat</span>
+          <span class="endpoint-desc">Send a chat message</span>
+          <span class="endpoint-toggle">&#9654;</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Send a message to the AI scheduling assistant. The AI will help the invitee choose an event type and find available times. No authentication required.</p>
+          <h4>Request Body</h4>
+          <table class="docs-table">
+            <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+            <tr><td><code>booking_page_slug</code></td><td>string</td><td>Yes</td><td>The booking page slug</td></tr>
+            <tr><td><code>session_id</code></td><td>string</td><td>No</td><td>Chat session ID (auto-generated if omitted)</td></tr>
+            <tr><td><code>message</code></td><td>string</td><td>Yes</td><td>The user's message</td></tr>
+          </table>
+          <h4>Response</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">json</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>{
+  <span class="str">"session_id"</span>: <span class="str">"abc-123"</span>,
+  <span class="str">"message"</span>: <span class="str">"I can help with that! Jane has a 30-minute call available..."</span>,
+  <span class="str">"action"</span>: {
+    <span class="str">"type"</span>: <span class="str">"suggest_booking"</span>,
+    <span class="str">"event_slug"</span>: <span class="str">"30-minute-call"</span>,
+    <span class="str">"preferred_dates"</span>: [<span class="str">"2026-03-10"</span>],
+    <span class="str">"preferred_time"</span>: <span class="str">"afternoon"</span>
+  }
+}</code></pre>
+          </div>
+          <h4>Example</h4>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-block-lang">curl</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code>curl -X POST https://calendo.dev/api/ai/chat \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -d <span class="str">'{
+    "booking_page_slug": "jane-smith",
+    "message": "I need a 30 minute call next Tuesday afternoon"
+  }'</span></code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Webhook Events Reference -->
+      <h2 id="webhooks">Webhook Events</h2>
+      <p>Calendo sends webhook notifications for key booking events. Your endpoint should respond with a 2xx status code within 10 seconds.</p>
+
+      <h3>Event Types</h3>
+      <table class="docs-table">
+        <tr><th>Event</th><th>Description</th></tr>
+        <tr><td><code>booking.created</code></td><td>A new booking has been confirmed</td></tr>
+        <tr><td><code>booking.cancelled</code></td><td>A booking has been cancelled</td></tr>
+        <tr><td><code>booking.rescheduled</code></td><td>A booking has been moved to a new time</td></tr>
+      </table>
+
+      <h3>Payload Format</h3>
+      <div class="code-block">
+        <div class="code-block-header"><span class="code-block-lang">json</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><code>{
+  <span class="str">"event"</span>: <span class="str">"booking.created"</span>,
+  <span class="str">"created_at"</span>: <span class="str">"2026-03-10T14:00:00Z"</span>,
+  <span class="str">"data"</span>: {
+    <span class="str">"booking"</span>: {
+      <span class="str">"uid"</span>: <span class="str">"a1b2c3d4-..."</span>,
+      <span class="str">"event_type"</span>: <span class="str">"30 Minute Call"</span>,
+      <span class="str">"invitee_name"</span>: <span class="str">"Bob Johnson"</span>,
+      <span class="str">"invitee_email"</span>: <span class="str">"bob@example.com"</span>,
+      <span class="str">"start_time"</span>: <span class="str">"2026-03-10 14:00:00"</span>,
+      <span class="str">"end_time"</span>: <span class="str">"2026-03-10 14:30:00"</span>,
+      <span class="str">"status"</span>: <span class="str">"confirmed"</span>,
+      <span class="str">"timezone"</span>: <span class="str">"America/New_York"</span>
+    }
+  }
+}</code></pre>
+      </div>
+
+      <h3>Signature Verification</h3>
+      <p>Each webhook request includes an <code>X-Calendo-Signature</code> header containing an HMAC-SHA256 signature of the request body, using your webhook secret as the key.</p>
+      <div class="code-block">
+        <div class="code-block-header"><span class="code-block-lang">javascript</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><code><span class="cmt">// Verify webhook signature (Node.js)</span>
+<span class="kw">const</span> crypto = require(<span class="str">'crypto'</span>);
+
+<span class="kw">function</span> verifySignature(body, signature, secret) {
+  <span class="kw">const</span> expected = crypto
+    .createHmac(<span class="str">'sha256'</span>, secret)
+    .update(body)
+    .digest(<span class="str">'hex'</span>);
+  <span class="kw">return</span> crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(expected)
+  );
+}</code></pre>
+      </div>
+
+      <h3>Retry Policy</h3>
+      <p>If your endpoint returns a non-2xx status code or times out, Calendo will retry the delivery up to <strong>3 times</strong> with exponential backoff:</p>
+      <ul>
+        <li>1st retry: 1 minute after initial attempt</li>
+        <li>2nd retry: 5 minutes after 1st retry</li>
+        <li>3rd retry: 30 minutes after 2nd retry</li>
+      </ul>
+      <p>After 3 failed attempts, the webhook delivery is marked as failed. You can check delivery status in your dashboard.</p>
+
+      <!-- Rate Limits -->
+      <h2 id="rate-limits">Rate Limits</h2>
+      <p>Rate limits protect the API from abuse and ensure fair usage for all users. Limits are applied per IP address for public endpoints and per user for authenticated endpoints.</p>
+
+      <h3>Limits by Endpoint Category</h3>
+      <table class="docs-table">
+        <tr><th>Category</th><th>Limit</th><th>Window</th><th>Key</th></tr>
+        <tr><td>Public endpoints (booking, availability, AI chat)</td><td>60 requests</td><td>1 minute</td><td>IP address</td></tr>
+        <tr><td>Authenticated endpoints (CRUD operations)</td><td>300 requests</td><td>1 minute</td><td>User ID</td></tr>
+      </table>
+
+      <h3>Rate Limit Headers</h3>
+      <p>All API responses include rate limit information in the headers:</p>
+      <table class="docs-table">
+        <tr><th>Header</th><th>Description</th></tr>
+        <tr><td><code>X-RateLimit-Limit</code></td><td>Maximum requests allowed in the window</td></tr>
+        <tr><td><code>X-RateLimit-Remaining</code></td><td>Requests remaining in the current window</td></tr>
+        <tr><td><code>X-RateLimit-Reset</code></td><td>Unix timestamp when the window resets</td></tr>
+      </table>
+
+      <h3>Exceeding the Limit</h3>
+      <p>When you exceed the rate limit, the API returns a <code>429 Too Many Requests</code> response with a <code>Retry-After</code> header indicating how many seconds to wait.</p>
+      <div class="code-block">
+        <div class="code-block-header"><span class="code-block-lang">json</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><code>{
+  <span class="str">"error"</span>: {
+    <span class="str">"code"</span>: <span class="str">"RATE_LIMIT_EXCEEDED"</span>,
+    <span class="str">"message"</span>: <span class="str">"Too many requests. Please retry after 42 seconds."</span>
+  }
+}</code></pre>
+      </div>
+
+      <!-- Errors -->
+      <h2 id="errors">Errors</h2>
+      <p>Calendo uses standard HTTP status codes and returns errors in a consistent JSON format.</p>
+
+      <h3>Error Format</h3>
+      <div class="code-block">
+        <div class="code-block-header"><span class="code-block-lang">json</span><button class="code-block-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><code>{
+  <span class="str">"error"</span>: <span class="str">"Human-readable error message"</span>
+}</code></pre>
+      </div>
+
+      <h3>Status Codes</h3>
+      <table class="docs-table">
+        <tr><th>Code</th><th>Meaning</th><th>Description</th></tr>
+        <tr><td><code>200</code></td><td>OK</td><td>Request succeeded</td></tr>
+        <tr><td><code>201</code></td><td>Created</td><td>Resource created successfully</td></tr>
+        <tr><td><code>400</code></td><td>Bad Request</td><td>Invalid input or missing required fields</td></tr>
+        <tr><td><code>401</code></td><td>Unauthorized</td><td>Missing or invalid authentication</td></tr>
+        <tr><td><code>403</code></td><td>Forbidden</td><td>Insufficient permissions</td></tr>
+        <tr><td><code>404</code></td><td>Not Found</td><td>Resource does not exist</td></tr>
+        <tr><td><code>409</code></td><td>Conflict</td><td>Resource already exists or time slot taken</td></tr>
+        <tr><td><code>429</code></td><td>Too Many Requests</td><td>Rate limit exceeded</td></tr>
+        <tr><td><code>500</code></td><td>Internal Server Error</td><td>Something went wrong on our end</td></tr>
+      </table>
+
+    </main>
+  </div>
+
+  <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">&#9776;</button>
+
+  <script>
+    // Copy code
+    function copyCode(btn) {
+      const code = btn.closest('.code-block').querySelector('code');
+      const text = code.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+      });
+    }
+
+    // Mobile sidebar
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const menuBtn = document.getElementById('mobile-menu-btn');
+
+    menuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('open');
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
+    });
+
+    // Active sidebar link on scroll
+    const sidebarLinks = document.querySelectorAll('.sidebar-link[href^="#"]');
+    const sections = [];
+    sidebarLinks.forEach(link => {
+      const id = link.getAttribute('href').slice(1);
+      const el = document.getElementById(id);
+      if (el) sections.push({ el, link });
+    });
+
+    window.addEventListener('scroll', () => {
+      const scrollPos = window.scrollY + 100;
+      let current = sections[0];
+      for (const s of sections) {
+        if (s.el.offsetTop <= scrollPos) current = s;
+      }
+      sidebarLinks.forEach(l => l.classList.remove('active'));
+      if (current) current.link.classList.add('active');
+    });
+  </script>
+
+</body>
+</html>

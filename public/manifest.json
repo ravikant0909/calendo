@@ -1,0 +1,21 @@
+{
+  "name": "Calendo — Smart Scheduling",
+  "short_name": "Calendo",
+  "id": "/",
+  "start_url": "/dashboard/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "description": "Smart scheduling powered by AI — the open-source Calendly alternative. Share a link, let invitees book, and let AI handle the back-and-forth.",
+  "categories": ["productivity", "business"],
+  "orientation": "any",
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    { "src": "/apple-touch-icon.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/calendo-logo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

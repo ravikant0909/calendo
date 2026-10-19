@@ -1,0 +1,41 @@
+{
+  "name": "calendo",
+  "version": "0.1.0",
+  "description": "Open-source scheduling platform with AI-powered booking. A Calendly competitor.",
+  "private": false,
+  "license": "AGPL-3.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest run",
+    "test:worker": "vitest run --config vitest.config.ts",
+    "test:client": "vitest run --config vitest.client.config.ts",
+    "test:watch": "vitest",
+    "db:migrate": "wrangler d1 execute calendo --file=./schema.sql",
+    "db:migrate:local": "wrangler d1 execute calendo --local --file=./schema.sql",
+    "prepare": "husky",
+    "test:schema": "node ./scripts/prepare-local-db.mjs .wrangler/schema-check",
+    "test:smoke": "node ./scripts/smoke-local.mjs",
+    "test:e2e:install": "playwright install chromium",
+    "test:e2e": "playwright test",
+    "test:e2e:ci": "playwright test tests/e2e/launch-booking-flow.spec.js",
+    "test:ci": "npm run test:worker && npm run test:client && npm run test:schema && npm run test:smoke"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.8.0",
+    "happy-dom": "^17.0.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0",
+    "vitest": "^3.2.0",
+    "wrangler": "^4.0.0",
+    "@playwright/test": "^1.52.0"
+  },
+  "lint-staged": {
+    "src/**/*.js": "vitest related --run",
+    "public/**/*.js": "vitest related --run --config vitest.client.config.ts"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

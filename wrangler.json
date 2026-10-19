@@ -1,0 +1,36 @@
+{
+  "name": "calendo",
+  "main": "src/worker.js",
+  "compatibility_date": "2025-01-01",
+  "workers_dev": false,
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+  "routes": [
+    { "pattern": "calendo.dev/*", "zone_name": "calendo.dev" },
+    { "pattern": "www.calendo.dev/*", "zone_name": "calendo.dev" }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "calendo",
+      "database_id": "f85111d8-9ae7-4034-b5c2-11077a136aae"
+    }
+  ],
+  "ai": {
+    "binding": "AI"
+  },
+  "triggers": {
+    "crons": ["*/5 * * * *"]
+  },
+  "vars": {
+    "APP_ORIGIN": "https://calendo.dev",
+    "TWILIO_ACCOUNT_SID": "",
+    "TWILIO_AUTH_TOKEN": "",
+    "TWILIO_PHONE_NUMBER": "",
+    "PAYPAL_CLIENT_ID": "",
+    "PAYPAL_CLIENT_SECRET": "",
+    "PAYPAL_MODE": "sandbox"
+  }
+}

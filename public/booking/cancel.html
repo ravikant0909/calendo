@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cancel Booking | Calendo</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --brand: #0069ff;
+      --brand-light: #e8f0fe;
+      --text: #1a1a1a;
+      --text-secondary: #555;
+      --text-muted: #888;
+      --border: #e0e0e0;
+      --bg: #ffffff;
+      --bg-page: #f7f8fa;
+      --bg-hover: #f5f5f5;
+      --success: #00a854;
+      --error: #e53e3e;
+      --error-light: #fff5f5;
+      --warning: #dd6b20;
+      --radius: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-lg: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-page);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .card {
+      background: var(--bg);
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      padding: 32px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .logo a {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--brand);
+      text-decoration: none;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .booking-details {
+      background: var(--bg-page);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .detail-value {
+      font-weight: 500;
+      font-size: 14px;
+      text-align: right;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--text-secondary);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      resize: vertical;
+      transition: border-color 0.15s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(0, 105, 255, 0.1);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+      width: 100%;
+      text-decoration: none;
+    }
+
+    .btn-danger {
+      background: var(--error);
+      color: #fff;
+    }
+
+    .btn-danger:hover {
+      background: #c53030;
+    }
+
+    .btn-danger:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .btn-link {
+      background: none;
+      color: var(--brand);
+      padding: 8px;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    .btn-link:hover {
+      text-decoration: underline;
+    }
+
+    .status-message {
+      padding: 16px;
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .status-success {
+      background: #f0fff4;
+      color: var(--success);
+      border: 1px solid #c6f6d5;
+    }
+
+    .status-error {
+      background: var(--error-light);
+      color: var(--error);
+      border: 1px solid #fed7d7;
+    }
+
+    .status-warning {
+      background: #fffaf0;
+      color: var(--warning);
+      border: 1px solid #feebc8;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--brand);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 560px) {
+      .container {
+        padding: 20px 12px;
+      }
+      .card {
+        padding: 24px 16px;
+      }
+      .detail-row {
+        flex-direction: column;
+        gap: 2px;
+      }
+      .detail-value {
+        text-align: left;
+      }
+    }
+  </style>
+  <!-- pwa-head -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Calendo">
+  <script src="/pwa.js" defer></script>
+</head>
+<body>
+
+<div class="container">
+  <div class="logo"><a href="/">Calendo</a></div>
+
+  <div class="card">
+    <!-- Loading state -->
+    <div id="loading">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Loading booking details...</p>
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div id="error-state" class="hidden">
+      <div class="status-message status-error" id="error-message"></div>
+    </div>
+
+    <!-- Booking details + cancel form -->
+    <div id="cancel-form" class="hidden">
+      <h1>Cancel Booking</h1>
+
+      <div class="booking-details">
+        <div class="detail-row">
+          <span class="detail-label">Event</span>
+          <span class="detail-value" id="event-name"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Host</span>
+          <span class="detail-value" id="host-name"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Date & Time</span>
+          <span class="detail-value" id="date-time"></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Your Name</span>
+          <span class="detail-value" id="invitee-name"></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="reason">Reason for cancellation (optional)</label>
+        <textarea id="reason" placeholder="Let the host know why you're cancelling..."></textarea>
+      </div>
+
+      <button class="btn btn-danger" id="cancel-btn" onclick="cancelBooking()">Cancel Booking</button>
+      <a class="btn btn-link" id="reschedule-link" href="#">Reschedule instead</a>
+    </div>
+
+    <!-- Success state -->
+    <div id="success-state" class="hidden">
+      <div class="status-message status-success">
+        Your booking has been cancelled successfully.
+      </div>
+      <p style="text-align:center; color: var(--text-secondary); font-size: 14px;">
+        The host has been notified of the cancellation.
+      </p>
+    </div>
+
+    <!-- Already cancelled / rescheduled state -->
+    <div id="already-state" class="hidden">
+      <div class="status-message status-warning" id="already-message"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function escapeHtml(str) {
+    // Must escape quotes too: values land inside attributes (href="...", alt="...").
+    if (str == null) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  let bookingData = null;
+
+  async function loadBooking() {
+    if (!token) {
+      showError('No booking token provided. Please use the link from your confirmation email.');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/bookings/by-token/' + encodeURIComponent(token));
+      const data = await res.json();
+
+      if (!res.ok) {
+        showError(data.error || 'Could not load booking details.');
+        return;
+      }
+
+      bookingData = data;
+
+      // Check status
+      if (data.status === 'cancelled') {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('already-state').classList.remove('hidden');
+        document.getElementById('already-message').textContent = 'This booking has already been cancelled.';
+        return;
+      }
+
+      if (data.status === 'rescheduled') {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('already-state').classList.remove('hidden');
+        document.getElementById('already-message').textContent = 'This booking has been rescheduled. Please use the updated booking link.';
+        return;
+      }
+
+      // Check if in the past
+      const startTime = new Date(data.start_time);
+      if (startTime <= new Date()) {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('already-state').classList.remove('hidden');
+        document.getElementById('already-message').textContent = 'This booking has already passed and cannot be cancelled.';
+        return;
+      }
+
+      // Show booking details
+      document.getElementById('event-name').textContent = data.event_type_name;
+      document.getElementById('host-name').textContent = data.host_name;
+      document.getElementById('invitee-name').textContent = data.invitee_name;
+
+      const tz = data.invitee_timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const dateStr = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      }).format(startTime);
+      document.getElementById('date-time').textContent = dateStr;
+
+      // Set reschedule link
+      document.getElementById('reschedule-link').href = '/booking/reschedule.html?token=' + encodeURIComponent(token);
+
+      // Show cancellation policy if set
+      if (data.cancellation_policy) {
+        const policyEl = document.createElement('div');
+        policyEl.className = 'status-message status-warning';
+        policyEl.style.marginBottom = '20px';
+        policyEl.innerHTML = '<strong>Cancellation Policy:</strong> ' + escapeHtml(data.cancellation_policy).replace(/\n/g, '<br>');
+        document.getElementById('cancel-btn').before(policyEl);
+      }
+
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('cancel-form').classList.remove('hidden');
+    } catch (err) {
+      showError('Failed to load booking details. Please try again.');
+    }
+  }
+
+  async function cancelBooking() {
+    const btn = document.getElementById('cancel-btn');
+    btn.disabled = true;
+    btn.textContent = 'Cancelling...';
+
+    try {
+      const reason = document.getElementById('reason').value.trim();
+      const res = await fetch('/api/bookings/cancel-by-token/' + encodeURIComponent(token), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: reason || undefined }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        btn.disabled = false;
+        btn.textContent = 'Cancel Booking';
+        showFormError(data.error || 'Failed to cancel booking.');
+        return;
+      }
+
+      document.getElementById('cancel-form').classList.add('hidden');
+      document.getElementById('success-state').classList.remove('hidden');
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Cancel Booking';
+      showFormError('Failed to cancel booking. Please try again.');
+    }
+  }
+
+  function showError(message) {
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('error-state').classList.remove('hidden');
+    document.getElementById('error-message').textContent = message;
+  }
+
+  function showFormError(message) {
+    let errorEl = document.getElementById('form-error');
+    if (!errorEl) {
+      errorEl = document.createElement('div');
+      errorEl.id = 'form-error';
+      errorEl.className = 'status-message status-error';
+      errorEl.style.marginBottom = '16px';
+      document.getElementById('cancel-btn').before(errorEl);
+    }
+    errorEl.textContent = message;
+  }
+
+  loadBooking();
+</script>
+
+</body>
+</html>

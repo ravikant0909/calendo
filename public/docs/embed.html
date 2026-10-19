@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendo Embed Widget Documentation</title>
+  <style>
+    /* ========== Reset & Base ========== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #fff; color: #1a1a1a; line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    :root {
+      --blue: #2563eb;
+      --blue-hover: #1d4ed8;
+      --blue-light: #eff6ff;
+      --blue-border: #bfdbfe;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      --green: #16a34a;
+      --green-light: #f0fdf4;
+      --green-border: #bbf7d0;
+      --orange: #ea580c;
+      --orange-light: #fff7ed;
+      --sidebar-width: 260px;
+    }
+
+    /* ========== Layout ========== */
+    .docs-layout { display: flex; min-height: 100vh; }
+
+    /* ========== Sidebar ========== */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--gray-50);
+      border-right: 1px solid var(--gray-200);
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      overflow-y: auto;
+      z-index: 50;
+    }
+
+    .sidebar-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sidebar-header .logo {
+      font-size: 20px; font-weight: 700; color: var(--blue); letter-spacing: -0.5px;
+    }
+
+    .sidebar-header .badge {
+      font-size: 11px; font-weight: 600; background: var(--blue-light);
+      color: var(--blue); padding: 2px 8px; border-radius: 4px;
+    }
+
+    .sidebar-nav { padding: 16px 0; }
+
+    .sidebar-section { padding: 0 12px; margin-bottom: 8px; }
+
+    .sidebar-section-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.2px; color: var(--gray-400); padding: 8px 12px 4px;
+    }
+
+    .sidebar-link {
+      display: block; padding: 6px 12px; font-size: 13px;
+      color: var(--gray-600); border-radius: 6px; transition: background 0.12s, color 0.12s;
+    }
+
+    .sidebar-link:hover { background: var(--gray-200); color: var(--gray-900); }
+    .sidebar-link.active { background: var(--blue-light); color: var(--blue); font-weight: 600; }
+
+    .sidebar-back {
+      display: block; padding: 12px 24px; font-size: 13px;
+      color: var(--gray-500); border-bottom: 1px solid var(--gray-200);
+    }
+    .sidebar-back:hover { color: var(--blue); }
+
+    /* ========== Main Content ========== */
+    .docs-content {
+      margin-left: var(--sidebar-width);
+      flex: 1; padding: 40px 56px 80px; max-width: 860px;
+    }
+
+    .docs-content h1 {
+      font-size: 32px; font-weight: 800; color: var(--gray-900);
+      margin-bottom: 12px; letter-spacing: -0.5px;
+    }
+
+    .docs-content h2 {
+      font-size: 24px; font-weight: 700; color: var(--gray-900);
+      margin-top: 56px; margin-bottom: 16px; padding-top: 24px;
+      border-top: 1px solid var(--gray-200);
+    }
+
+    .docs-content h2:first-of-type { border-top: none; margin-top: 32px; }
+
+    .docs-content h3 {
+      font-size: 18px; font-weight: 700; color: var(--gray-800);
+      margin-top: 36px; margin-bottom: 12px;
+    }
+
+    .docs-content h4 {
+      font-size: 15px; font-weight: 700; color: var(--gray-700);
+      margin-top: 24px; margin-bottom: 8px;
+    }
+
+    .docs-content p {
+      font-size: 15px; color: var(--gray-600); margin-bottom: 16px; line-height: 1.7;
+    }
+
+    .docs-content > .lead {
+      font-size: 17px; color: var(--gray-500); margin-bottom: 32px;
+    }
+
+    .docs-content ul, .docs-content ol { margin-bottom: 16px; padding-left: 24px; }
+
+    .docs-content li {
+      font-size: 15px; color: var(--gray-600); margin-bottom: 6px; line-height: 1.7;
+    }
+
+    .docs-content code {
+      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
+      font-size: 13px; background: var(--gray-100); color: var(--gray-800);
+      padding: 2px 6px; border-radius: 4px;
+    }
+
+    /* ========== Code Blocks ========== */
+    .code-block {
+      position: relative; margin-bottom: 24px; border-radius: 8px;
+      overflow: hidden; border: 1px solid var(--gray-200);
+    }
+
+    .code-block-header {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--gray-50); border-bottom: 1px solid var(--gray-200);
+      padding: 8px 16px;
+    }
+
+    .code-block-lang {
+      font-size: 12px; font-weight: 600; color: var(--gray-400);
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    .code-block-copy {
+      background: none; border: 1px solid var(--gray-300); border-radius: 4px;
+      padding: 4px 10px; font-size: 12px; color: var(--gray-500);
+      cursor: pointer; transition: all 0.12s;
+    }
+
+    .code-block-copy:hover { background: var(--gray-100); color: var(--gray-700); }
+
+    .code-block pre {
+      margin: 0; padding: 16px; overflow-x: auto; background: #fff;
+    }
+
+    .code-block pre code {
+      background: none; padding: 0; font-size: 13px; line-height: 1.6; color: var(--gray-800);
+    }
+
+    .code-block .kw { color: #7c3aed; }
+    .code-block .str { color: #16a34a; }
+    .code-block .num { color: #ea580c; }
+    .code-block .cmt { color: var(--gray-400); font-style: italic; }
+    .code-block .tag { color: var(--blue); }
+    .code-block .attr { color: #7c3aed; }
+    .code-block .val { color: #16a34a; }
+
+    /* ========== Tables ========== */
+    .docs-table {
+      width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 14px;
+    }
+
+    .docs-table th {
+      text-align: left; padding: 10px 16px; background: var(--gray-50);
+      border: 1px solid var(--gray-200); font-weight: 600; color: var(--gray-700); font-size: 13px;
+    }
+
+    .docs-table td {
+      padding: 10px 16px; border: 1px solid var(--gray-200);
+      color: var(--gray-600); vertical-align: top;
+    }
+
+    .docs-table td code { font-size: 12px; }
+
+    /* ========== Callouts ========== */
+    .callout {
+      padding: 16px 20px; border-radius: 8px; margin-bottom: 24px;
+      font-size: 14px; line-height: 1.6;
+    }
+
+    .callout-info {
+      background: var(--blue-light); border: 1px solid var(--blue-border); color: var(--gray-700);
+    }
+
+    .callout-warn {
+      background: var(--orange-light); border: 1px solid #fed7aa; color: var(--gray-700);
+    }
+
+    .callout-title { font-weight: 700; margin-bottom: 4px; }
+
+    /* ========== Preview Frames ========== */
+    .preview-container {
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .preview-header {
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .preview-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+
+    .preview-dot-red { background: #ef4444; }
+    .preview-dot-yellow { background: #f59e0b; }
+    .preview-dot-green { background: #22c55e; }
+
+    .preview-label {
+      font-size: 12px; color: var(--gray-400); margin-left: 8px; font-weight: 500;
+    }
+
+    .preview-body {
+      padding: 32px;
+      background: #fff;
+      min-height: 180px;
+      position: relative;
+    }
+
+    /* ========== Live Demo Widgets ========== */
+    .demo-badge {
+      position: absolute; bottom: 24px; right: 24px;
+      background: var(--blue); color: #fff; border: none; border-radius: 50px;
+      padding: 14px 24px; cursor: pointer; font-size: 15px; font-weight: 600;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .demo-badge svg { width: 18px; height: 18px; }
+
+    .demo-popup-btn {
+      background: var(--blue); color: #fff; border: none; border-radius: 8px;
+      padding: 12px 24px; cursor: pointer; font-size: 15px; font-weight: 600;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .demo-inline-frame {
+      border: 1px solid var(--gray-200); border-radius: 12px;
+      background: var(--gray-50); padding: 24px; text-align: center;
+      color: var(--gray-400); font-size: 14px;
+      min-height: 200px; display: flex; align-items: center; justify-content: center;
+    }
+
+    .demo-inline-frame-inner {
+      width: 100%;
+    }
+
+    .demo-inline-frame .demo-cal-header {
+      font-size: 16px; font-weight: 600; color: var(--gray-800); margin-bottom: 16px;
+    }
+
+    .demo-inline-frame .demo-cal-slots {
+      display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+    }
+
+    .demo-inline-frame .demo-slot {
+      background: var(--blue-light); color: var(--blue); border: 1px solid var(--blue-border);
+      padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500;
+    }
+
+    /* ========== Mode Tabs ========== */
+    .mode-tabs {
+      display: flex; gap: 4px; background: var(--gray-100); padding: 4px;
+      border-radius: 8px; margin-bottom: 24px; width: fit-content;
+    }
+
+    .mode-tab {
+      padding: 8px 20px; font-size: 14px; font-weight: 500; color: var(--gray-600);
+      border: none; background: none; border-radius: 6px; cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .mode-tab:hover { color: var(--gray-800); }
+    .mode-tab.active { background: #fff; color: var(--gray-900); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+    /* ========== Mode Panels ========== */
+    .mode-panel { display: none; }
+    .mode-panel.active { display: block; }
+
+    /* ========== Mobile ========== */
+    .mobile-menu-btn {
+      display: none;
+      position: fixed; bottom: 20px; right: 20px; z-index: 100;
+      background: var(--blue); color: #fff; border: none; border-radius: 50%;
+      width: 48px; height: 48px; font-size: 24px; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.25s; z-index: 200; }
+      .sidebar.open { transform: translateX(0); }
+      .docs-content { margin-left: 0; padding: 32px 24px 80px; }
+      .mobile-menu-btn { display: flex; align-items: center; justify-content: center; }
+      .sidebar-overlay {
+        display: none; position: fixed; inset: 0;
+        background: rgba(0,0,0,0.4); z-index: 199;
+      }
+      .sidebar-overlay.open { display: block; }
+    }
+  </style>
+  <!-- pwa-head -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Calendo">
+  <script src="/pwa.js" defer></script>
+</head>
+<body>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <a href="/" class="sidebar-back">&#8592; Back to Calendo</a>
+      <div class="sidebar-header">
+        <span class="logo">Embed Docs</span>
+        <span class="badge">v1</span>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Getting Started</div>
+          <a href="#installation" class="sidebar-link active">Installation</a>
+          <a href="#quick-start" class="sidebar-link">Quick Start</a>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Modes</div>
+          <a href="#modes" class="sidebar-link">Overview</a>
+          <a href="#badge-mode" class="sidebar-link">Badge Mode</a>
+          <a href="#popup-mode" class="sidebar-link">Popup Mode</a>
+          <a href="#inline-mode" class="sidebar-link">Inline Mode</a>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Reference</div>
+          <a href="#customization" class="sidebar-link">Customization</a>
+          <a href="#examples" class="sidebar-link">Examples</a>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">See Also</div>
+          <a href="/docs/" class="sidebar-link">API Documentation</a>
+        </div>
+      </nav>
+    </aside>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Main Content -->
+    <main class="docs-content">
+
+      <h1 id="installation">Embed Widget</h1>
+      <p class="lead">Add Calendo scheduling to any website with a single script tag. No build tools, no frameworks -- just paste and go.</p>
+
+      <h3>Script Tag</h3>
+      <p>Add this script tag anywhere in your HTML. The widget loads asynchronously and will not block your page.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">html</span>
+          <button class="code-block-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>&lt;<span class="tag">script</span>
+  <span class="attr">src</span>=<span class="val">"https://calendo.dev/embed.js"</span>
+  <span class="attr">data-calendo-user</span>=<span class="val">"your-username"</span>
+&gt;&lt;/<span class="tag">script</span>&gt;</code></pre>
+      </div>
+
+      <p>Replace <code>your-username</code> with your Calendo booking page slug (found in your dashboard under Settings).</p>
+
+      <!-- Quick Start -->
+      <h2 id="quick-start">Quick Start</h2>
+      <p>The simplest integration is the badge mode, which adds a floating "Book a meeting" button to the bottom-right corner of your page. Just add the script tag -- no additional configuration needed.</p>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">html</span>
+          <button class="code-block-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>&lt;!DOCTYPE html&gt;
+&lt;<span class="tag">html</span>&gt;
+&lt;<span class="tag">head</span>&gt;
+  &lt;<span class="tag">title</span>&gt;My Website&lt;/<span class="tag">title</span>&gt;
+&lt;/<span class="tag">head</span>&gt;
+&lt;<span class="tag">body</span>&gt;
+  &lt;<span class="tag">h1</span>&gt;Welcome to my site&lt;/<span class="tag">h1</span>&gt;
+  &lt;<span class="tag">p</span>&gt;Your page content here...&lt;/<span class="tag">p</span>&gt;
+
+  <span class="cmt">&lt;!-- Calendo embed widget --&gt;</span>
+  &lt;<span class="tag">script</span>
+    <span class="attr">src</span>=<span class="val">"https://calendo.dev/embed.js"</span>
+    <span class="attr">data-calendo-user</span>=<span class="val">"your-username"</span>
+  &gt;&lt;/<span class="tag">script</span>&gt;
+&lt;/<span class="tag">body</span>&gt;
+&lt;/<span class="tag">html</span>&gt;</code></pre>
+      </div>
+
+      <!-- Modes -->
+      <h2 id="modes">Embed Modes</h2>
+      <p>The widget supports three display modes, each suited to different use cases. Set the mode using the <code>data-calendo-mode</code> attribute.</p>
+
+      <div class="mode-tabs">
+        <button class="mode-tab active" onclick="showMode('badge')">Badge</button>
+        <button class="mode-tab" onclick="showMode('popup')">Popup</button>
+        <button class="mode-tab" onclick="showMode('inline')">Inline</button>
+      </div>
+
+      <!-- Badge Mode -->
+      <div class="mode-panel active" id="mode-badge">
+        <h3 id="badge-mode">Badge Mode</h3>
+        <p>Displays a floating button in the bottom-right corner of the page. Clicking it opens a modal with your booking page. This is the <strong>default mode</strong>.</p>
+
+        <div class="preview-container">
+          <div class="preview-header">
+            <span class="preview-dot preview-dot-red"></span>
+            <span class="preview-dot preview-dot-yellow"></span>
+            <span class="preview-dot preview-dot-green"></span>
+            <span class="preview-label">Live Preview</span>
+          </div>
+          <div class="preview-body" style="min-height: 200px;">
+            <p style="color: var(--gray-400); font-size: 14px;">Your website content would appear here...</p>
+            <button class="demo-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              Book a meeting
+            </button>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">html</span>
+            <button class="code-block-copy" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code><span class="cmt">&lt;!-- Badge mode (default) --&gt;</span>
+&lt;<span class="tag">script</span>
+  <span class="attr">src</span>=<span class="val">"https://calendo.dev/embed.js"</span>
+  <span class="attr">data-calendo-user</span>=<span class="val">"your-username"</span>
+  <span class="attr">data-calendo-mode</span>=<span class="val">"badge"</span>
+&gt;&lt;/<span class="tag">script</span>&gt;</code></pre>
+        </div>
+      </div>
+
+      <!-- Popup Mode -->
+      <div class="mode-panel" id="mode-popup">
+        <h3 id="popup-mode">Popup Mode</h3>
+        <p>Renders a button inline with your content. Clicking the button opens a modal with your booking page. Use this when you want the booking button placed at a specific position in your page.</p>
+
+        <div class="preview-container">
+          <div class="preview-header">
+            <span class="preview-dot preview-dot-red"></span>
+            <span class="preview-dot preview-dot-yellow"></span>
+            <span class="preview-dot preview-dot-green"></span>
+            <span class="preview-label">Live Preview</span>
+          </div>
+          <div class="preview-body" style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px; justify-content: center;">
+            <p style="color: var(--gray-600); font-size: 15px;">Want to schedule a call? Click below.</p>
+            <button class="demo-popup-btn">Book a meeting</button>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">html</span>
+            <button class="code-block-copy" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code><span class="cmt">&lt;!-- Popup mode: button appears where script tag is placed --&gt;</span>
+&lt;<span class="tag">p</span>&gt;Want to schedule a call? Click below.&lt;/<span class="tag">p</span>&gt;
+&lt;<span class="tag">script</span>
+  <span class="attr">src</span>=<span class="val">"https://calendo.dev/embed.js"</span>
+  <span class="attr">data-calendo-user</span>=<span class="val">"your-username"</span>
+  <span class="attr">data-calendo-mode</span>=<span class="val">"popup"</span>
+  <span class="attr">data-calendo-text</span>=<span class="val">"Book a meeting"</span>
+&gt;&lt;/<span class="tag">script</span>&gt;</code></pre>
+        </div>
+      </div>
+
+      <!-- Inline Mode -->
+      <div class="mode-panel" id="mode-inline">
+        <h3 id="inline-mode">Inline Mode</h3>
+        <p>Embeds the full booking page directly into your page via an iframe. No modal, no button -- the scheduler is rendered right where you place the script tag. Best for dedicated booking pages.</p>
+
+        <div class="preview-container">
+          <div class="preview-header">
+            <span class="preview-dot preview-dot-red"></span>
+            <span class="preview-dot preview-dot-yellow"></span>
+            <span class="preview-dot preview-dot-green"></span>
+            <span class="preview-label">Live Preview</span>
+          </div>
+          <div class="preview-body" style="padding: 16px;">
+            <div class="demo-inline-frame">
+              <div class="demo-inline-frame-inner">
+                <div class="demo-cal-header">Select a time</div>
+                <div class="demo-cal-slots">
+                  <span class="demo-slot">9:00 AM</span>
+                  <span class="demo-slot">10:00 AM</span>
+                  <span class="demo-slot">11:00 AM</span>
+                  <span class="demo-slot">2:00 PM</span>
+                  <span class="demo-slot">3:00 PM</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">html</span>
+            <button class="code-block-copy" onclick="copyCode(this)">Copy</button>
+          </div>
+          <pre><code><span class="cmt">&lt;!-- Inline mode: scheduler embedded directly --&gt;</span>
+&lt;<span class="tag">script</span>
+  <span class="attr">src</span>=<span class="val">"https://calendo.dev/embed.js"</span>
+  <span class="attr">data-calendo-user</span>=<span class="val">"your-username"</span>
+  <span class="attr">data-calendo-mode</span>=<span class="val">"inline"</span>
+&gt;&lt;/<span class="tag">script</span>&gt;</code></pre>
+        </div>
+      </div>
+
+      <!-- Customization -->
+      <h2 id="customization">Customization</h2>
+      <p>Configure the widget using <code>data-calendo-*</code> attributes on the script tag.</p>
+
+      <table class="docs-table">
+        <tr>
+          <th>Attribute</th>
+          <th>Type</th>
+          <th>Default</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><code>data-calendo-user</code></td>
+          <td>string</td>
+          <td>--</td>
+          <td><strong>Required.</strong> Your booking page slug (e.g., <code>jane-smith</code>)</td>
+        </tr>
+        <tr>
+          <td><code>data-calendo-event</code></td>
+          <td>string</td>
+          <td>--</td>
+          <td>Specific event type slug. If set, skips event selection and goes straight to time picker</td>
+        </tr>
+        <tr>
+          <td><code>data-calendo-mode</code></td>
+          <td>string</td>
+          <td><code>badge</code></td>
+          <td>Display mode: <code>badge</code>, <code>popup</code>, or <code>inline</code></td>
+        </tr>
+        <tr>
+          <td><code>data-calendo-color</code></td>
+          <td>string</td>
+          <td><code>#2563eb</code></td>
+          <td>Primary color for the button (any valid CSS color)</td>
+        </tr>
+        <tr>
+          <td><code>data-calendo-text</code></td>
+          <td>string</td>
+          <td><code>Book a meeting</code></td>
+          <td>Button text (for badge and popup modes)</td>
+        </tr>
+      </table>
+
+      <h3>Custom Color Example</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">html</span>
+          <button class="code-block-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>&lt;<span class="tag">script</span>
+  <span class="attr">src</span>=<span class="val">"https://calendo.dev/embed.js"</span>
+  <span class="attr">data-calendo-user</span>=<span class="val">"your-username"</span>
+  <span class="attr">data-calendo-color</span>=<span class="val">"#7c3aed"</span>
+  <span class="attr">data-calendo-text</span>=<span class="val">"Schedule a call"</span>
+&gt;&lt;/<span class="tag">script</span>&gt;</code></pre>
+      </div>
+
+      <h3>Direct to Event Type</h3>
+      <p>Skip the event type selection by specifying the event slug. The invitee goes directly to the time picker.</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">html</span>
+          <button class="code-block-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>&lt;<span class="tag">script</span>
+  <span class="attr">src</span>=<span class="val">"https://calendo.dev/embed.js"</span>
+  <span class="attr">data-calendo-user</span>=<span class="val">"your-username"</span>
+  <span class="attr">data-calendo-event</span>=<span class="val">"30-minute-call"</span>
+  <span class="attr">data-calendo-mode</span>=<span class="val">"popup"</span>
+  <span class="attr">data-calendo-text</span>=<span class="val">"Book a 30-min call"</span>
+&gt;&lt;/<span class="tag">script</span>&gt;</code></pre>
+      </div>
+
+      <!-- Examples -->
+      <h2 id="examples">Full Page Examples</h2>
+      <p>Complete HTML pages showing each embed mode in context.</p>
+
+      <h3>Badge on a Portfolio Site</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">html</span>
+          <button class="code-block-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>&lt;!DOCTYPE html&gt;
+&lt;<span class="tag">html</span> <span class="attr">lang</span>=<span class="val">"en"</span>&gt;
+&lt;<span class="tag">head</span>&gt;
+  &lt;<span class="tag">meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span>&gt;
+  &lt;<span class="tag">meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span>&gt;
+  &lt;<span class="tag">title</span>&gt;Jane Smith - Designer&lt;/<span class="tag">title</span>&gt;
+&lt;/<span class="tag">head</span>&gt;
+&lt;<span class="tag">body</span>&gt;
+  &lt;<span class="tag">h1</span>&gt;Jane Smith&lt;/<span class="tag">h1</span>&gt;
+  &lt;<span class="tag">p</span>&gt;Product Designer. Available for freelance work.&lt;/<span class="tag">p</span>&gt;
+
+  <span class="cmt">&lt;!-- Floating badge button --&gt;</span>
+  &lt;<span class="tag">script</span>
+    <span class="attr">src</span>=<span class="val">"https://calendo.dev/embed.js"</span>
+    <span class="attr">data-calendo-user</span>=<span class="val">"jane-smith"</span>
+    <span class="attr">data-calendo-color</span>=<span class="val">"#7c3aed"</span>
+    <span class="attr">data-calendo-text</span>=<span class="val">"Schedule a call"</span>
+  &gt;&lt;/<span class="tag">script</span>&gt;
+&lt;/<span class="tag">body</span>&gt;
+&lt;/<span class="tag">html</span>&gt;</code></pre>
+      </div>
+
+      <h3>Inline Scheduler on a Contact Page</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">html</span>
+          <button class="code-block-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>&lt;!DOCTYPE html&gt;
+&lt;<span class="tag">html</span> <span class="attr">lang</span>=<span class="val">"en"</span>&gt;
+&lt;<span class="tag">head</span>&gt;
+  &lt;<span class="tag">meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span>&gt;
+  &lt;<span class="tag">meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span>&gt;
+  &lt;<span class="tag">title</span>&gt;Contact Us&lt;/<span class="tag">title</span>&gt;
+&lt;/<span class="tag">head</span>&gt;
+&lt;<span class="tag">body</span>&gt;
+  &lt;<span class="tag">h1</span>&gt;Schedule a Meeting&lt;/<span class="tag">h1</span>&gt;
+  &lt;<span class="tag">p</span>&gt;Pick a time that works for you:&lt;/<span class="tag">p</span>&gt;
+
+  <span class="cmt">&lt;!-- Inline scheduler --&gt;</span>
+  &lt;<span class="tag">script</span>
+    <span class="attr">src</span>=<span class="val">"https://calendo.dev/embed.js"</span>
+    <span class="attr">data-calendo-user</span>=<span class="val">"jane-smith"</span>
+    <span class="attr">data-calendo-event</span>=<span class="val">"30-minute-call"</span>
+    <span class="attr">data-calendo-mode</span>=<span class="val">"inline"</span>
+  &gt;&lt;/<span class="tag">script</span>&gt;
+&lt;/<span class="tag">body</span>&gt;
+&lt;/<span class="tag">html</span>&gt;</code></pre>
+      </div>
+
+      <h3>Popup Button in a Landing Page</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">html</span>
+          <button class="code-block-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>&lt;!DOCTYPE html&gt;
+&lt;<span class="tag">html</span> <span class="attr">lang</span>=<span class="val">"en"</span>&gt;
+&lt;<span class="tag">head</span>&gt;
+  &lt;<span class="tag">meta</span> <span class="attr">charset</span>=<span class="val">"UTF-8"</span>&gt;
+  &lt;<span class="tag">meta</span> <span class="attr">name</span>=<span class="val">"viewport"</span> <span class="attr">content</span>=<span class="val">"width=device-width, initial-scale=1.0"</span>&gt;
+  &lt;<span class="tag">title</span>&gt;Acme Consulting&lt;/<span class="tag">title</span>&gt;
+&lt;/<span class="tag">head</span>&gt;
+&lt;<span class="tag">body</span>&gt;
+  &lt;<span class="tag">section</span>&gt;
+    &lt;<span class="tag">h1</span>&gt;Grow your business with Acme&lt;/<span class="tag">h1</span>&gt;
+    &lt;<span class="tag">p</span>&gt;Book a free 30-minute strategy session.&lt;/<span class="tag">p</span>&gt;
+
+    <span class="cmt">&lt;!-- Popup booking button --&gt;</span>
+    &lt;<span class="tag">script</span>
+      <span class="attr">src</span>=<span class="val">"https://calendo.dev/embed.js"</span>
+      <span class="attr">data-calendo-user</span>=<span class="val">"jane-smith"</span>
+      <span class="attr">data-calendo-event</span>=<span class="val">"strategy-session"</span>
+      <span class="attr">data-calendo-mode</span>=<span class="val">"popup"</span>
+      <span class="attr">data-calendo-text</span>=<span class="val">"Book Free Session"</span>
+      <span class="attr">data-calendo-color</span>=<span class="val">"#16a34a"</span>
+    &gt;&lt;/<span class="tag">script</span>&gt;
+  &lt;/<span class="tag">section</span>&gt;
+&lt;/<span class="tag">body</span>&gt;
+&lt;/<span class="tag">html</span>&gt;</code></pre>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Need help?</div>
+        Check the <a href="/docs/" style="color: var(--blue); text-decoration: underline;">API documentation</a> for programmatic access, or open an issue on <a href="https://github.com/ravikant0909/calendo" style="color: var(--blue); text-decoration: underline;">GitHub</a>.
+      </div>
+
+    </main>
+  </div>
+
+  <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">&#9776;</button>
+
+  <script>
+    // Copy code
+    function copyCode(btn) {
+      const code = btn.closest('.code-block').querySelector('code');
+      const text = code.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+      });
+    }
+
+    // Mode tabs
+    function showMode(mode) {
+      document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.mode-panel').forEach(p => p.classList.remove('active'));
+      document.querySelector(`.mode-tab[onclick="showMode('${mode}')"]`).classList.add('active');
+      document.getElementById('mode-' + mode).classList.add('active');
+    }
+
+    // Mobile sidebar
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const menuBtn = document.getElementById('mobile-menu-btn');
+
+    menuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('open');
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
+    });
+
+    // Active sidebar link on scroll
+    const sidebarLinks = document.querySelectorAll('.sidebar-link[href^="#"]');
+    const sections = [];
+    sidebarLinks.forEach(link => {
+      const id = link.getAttribute('href').slice(1);
+      const el = document.getElementById(id);
+      if (el) sections.push({ el, link });
+    });
+
+    window.addEventListener('scroll', () => {
+      const scrollPos = window.scrollY + 100;
+      let current = sections[0];
+      for (const s of sections) {
+        if (s.el.offsetTop <= scrollPos) current = s;
+      }
+      sidebarLinks.forEach(l => l.classList.remove('active'));
+      if (current) current.link.classList.add('active');
+    });
+  </script>
+
+</body>
+</html>

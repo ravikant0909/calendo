@@ -1,0 +1,63 @@
+/* Calendo Gmail Extension Styles */
+
+.calendo-insert-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 12px;
+  margin-left: 8px;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  background: #fff;
+  color: #2563eb;
+  font-family: 'Google Sans', Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s, box-shadow 0.15s;
+  vertical-align: middle;
+}
+
+.calendo-insert-btn:hover {
+  background: #eff6ff;
+  border-color: #2563eb;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.15);
+}
+
+.calendo-insert-btn:active {
+  background: #dbeafe;
+}
+
+.calendo-insert-btn:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 1px;
+}
+
+.calendo-tooltip {
+  position: absolute;
+  background: #1f2937;
+  color: #fff;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 10000;
+  pointer-events: none;
+  animation: calendo-fade-in 0.15s ease-out;
+}
+
+.calendo-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 16px;
+  border: 4px solid transparent;
+  border-top-color: #1f2937;
+}
+
+@keyframes calendo-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

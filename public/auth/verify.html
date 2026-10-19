@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Your Email - Calendo</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="/apple-touch-icon.png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1a1a1a; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .container { width: 100%; max-width: 480px; padding: 24px; text-align: center; }
+    .logo { display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 32px; font-weight: 700; color: #2563eb; margin-bottom: 40px; }
+    .logo img { width: 40px; height: 40px; display: block; }
+    h1 { font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 16px; }
+    p { font-size: 15px; color: #64748b; line-height: 1.7; margin-bottom: 8px; }
+    strong { color: #0f172a; }
+    a { color: #2563eb; text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    #resendMsg { margin-top: 12px; font-size: 14px; }
+  </style>
+  <!-- pwa-head -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Calendo">
+  <script src="/pwa.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <div class="logo"><img src="/calendo-logo-256.png" alt="">Calendo</div>
+    <h1>Before continuing, we need to verify your email address.</h1>
+    <p>Please check your inbox for a confirmation link.</p>
+    <p>If you do not receive the email at <strong id="userEmail">your email</strong> within an hour, we can <a href="#" id="resendLink">resend it to you</a>.</p>
+    <p style="margin-top:16px;">If you want to sign up with a different account, <a href="/auth/register.html">click here</a>.</p>
+    <div id="resendMsg"></div>
+    <p id="pollStatus" style="margin-top:20px;font-size:13px;color:#94a3b8;">Checking for verification…</p>
+  </div>
+  <script>
+    let pollTimer = null;
+
+    async function checkVerified() {
+      try {
+        const res = await fetch('/api/auth/me', { credentials: 'include' });
+        if (!res.ok) {
+          if (pollTimer) clearInterval(pollTimer);
+          window.location.href = '/auth/login.html';
+          return;
+        }
+        const user = await res.json();
+        if (user.email_verified) {
+          if (pollTimer) clearInterval(pollTimer);
+          document.getElementById('pollStatus').textContent = 'Verified! Redirecting…';
+          document.getElementById('pollStatus').style.color = '#16a34a';
+          window.location.href = '/onboarding/';
+          return;
+        }
+        const emailEl = document.getElementById('userEmail');
+        if (emailEl.textContent === 'your email') emailEl.textContent = user.email;
+      } catch {
+        if (pollTimer) clearInterval(pollTimer);
+        window.location.href = '/auth/login.html';
+      }
+    }
+
+    checkVerified();
+    pollTimer = setInterval(checkVerified, 3000);
+
+    document.getElementById('resendLink').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const msgEl = document.getElementById('resendMsg');
+      try {
+        const r = await fetch('/api/auth/resend-verification', { method: 'POST', credentials: 'include' });
+        if (r.ok) { msgEl.style.color = '#16a34a'; msgEl.textContent = 'Verification email resent! Check your inbox.'; }
+        else { msgEl.style.color = '#dc2626'; msgEl.textContent = 'Failed to resend. Please try again.'; }
+      } catch { msgEl.style.color = '#dc2626'; msgEl.textContent = 'Network error. Please try again.'; }
+    });
+  </script>
+</body>
+</html>

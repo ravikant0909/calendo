@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team - Calendo</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --blue: #2563eb;
+      --blue-hover: #1d4ed8;
+      --blue-light: #eff6ff;
+      --blue-border: #bfdbfe;
+      --green: #16a34a;
+      --green-light: #f0fdf4;
+      --red: #dc2626;
+      --red-light: #fef2f2;
+      --orange: #ea580c;
+      --orange-light: #fff7ed;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+      --radius: 10px;
+    }
+    html { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #fff;
+      color: #1a1a1a;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      height: 100%;
+    }
+
+    .page-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+    .page-header h1 { font-size: 24px; font-weight: 700; }
+    .back-link {
+      color: var(--gray-500);
+      text-decoration: none;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+    .back-link:hover { color: var(--blue); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover { background: var(--blue-hover); }
+    .btn-secondary { background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-200); }
+    .btn-secondary:hover { background: var(--gray-200); }
+    .btn-danger { background: var(--red-light); color: var(--red); }
+    .btn-danger:hover { opacity: 0.85; }
+    .btn-sm { padding: 4px 10px; font-size: 13px; }
+
+    /* Cards */
+    .card {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .card-header h2 { font-size: 18px; font-weight: 600; }
+
+    /* Org selector */
+    .org-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .org-card {
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 20px;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .org-card:hover { border-color: var(--blue-border); box-shadow: var(--shadow-md); }
+    .org-card.active { border-color: var(--blue); background: var(--blue-light); }
+    .org-card-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .org-card-slug { font-size: 13px; color: var(--gray-500); }
+    .org-card-role { font-size: 12px; color: var(--blue); font-weight: 500; margin-top: 8px; text-transform: uppercase; }
+
+    /* Members table */
+    .members-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .members-table th {
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .members-table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 14px;
+    }
+    .members-table tr:last-child td { border-bottom: none; }
+    .member-name { font-weight: 500; }
+    .member-email { color: var(--gray-500); font-size: 13px; }
+    .role-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .role-owner { background: var(--orange-light); color: var(--orange); }
+    .role-admin { background: var(--blue-light); color: var(--blue); }
+    .role-member { background: var(--gray-100); color: var(--gray-600); }
+
+    /* Event type cards */
+    .team-et-list { display: flex; flex-direction: column; gap: 12px; }
+    .team-et-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+    }
+    .team-et-info { flex: 1; }
+    .team-et-name { font-weight: 500; margin-bottom: 2px; }
+    .team-et-meta { font-size: 13px; color: var(--gray-500); }
+    .mode-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--green-light);
+      color: var(--green);
+    }
+
+    /* Forms */
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      color: var(--gray-700);
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .form-row { display: flex; gap: 12px; }
+    .form-row .form-group { flex: 1; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-overlay.visible { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 480px;
+      padding: 28px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+    .modal h3 { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--gray-500);
+    }
+    .empty-state p { margin-bottom: 16px; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--gray-800);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 2000;
+    }
+    .toast.visible { opacity: 1; transform: translateY(0); }
+
+    /* Stats */
+    .stat-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-item {
+      flex: 1;
+      padding: 16px;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      text-align: center;
+    }
+    .stat-value { font-size: 28px; font-weight: 700; color: var(--blue); }
+    .stat-label { font-size: 13px; color: var(--gray-500); margin-top: 2px; }
+  </style>
+  <!-- pwa-head -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Calendo">
+  <script src="/pwa.js" defer></script>
+</head>
+<body>
+  <div class="page-container">
+    <a href="/dashboard/" class="back-link">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      Back to Dashboard
+    </a>
+
+    <!-- Org list / Create -->
+    <div id="orgListView">
+      <div class="page-header">
+        <h1>Teams</h1>
+        <button class="btn btn-primary" id="createOrgBtn">+ New Team</button>
+      </div>
+      <div class="org-list" id="orgList">
+        <div class="empty-state" id="noOrgsMessage">
+          <p>You haven't created or joined any teams yet.</p>
+          <button class="btn btn-primary" id="createOrgBtn2">Create your first team</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Org detail view (hidden by default) -->
+    <div id="orgDetailView" style="display: none;">
+      <a href="#" class="back-link" id="backToOrgsLink">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back to Teams
+      </a>
+
+      <div class="page-header">
+        <h1 id="orgName">Team Name</h1>
+        <button class="btn btn-secondary btn-sm" id="editOrgBtn">Edit</button>
+      </div>
+
+      <!-- Stats row -->
+      <div class="stat-row" id="orgStats"></div>
+
+      <!-- Members -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Members</h2>
+          <button class="btn btn-primary btn-sm" id="inviteMemberBtn">+ Invite</button>
+        </div>
+        <table class="members-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Bookings (30d)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="membersTableBody"></tbody>
+        </table>
+
+        <!-- Pending invitations -->
+        <div id="pendingInvites" style="display: none; margin-top: 16px;">
+          <h3 style="font-size: 14px; color: var(--gray-500); margin-bottom: 8px;">Pending Invitations</h3>
+          <div id="pendingInvitesList"></div>
+        </div>
+      </div>
+
+      <!-- Team Event Types -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Team Event Types</h2>
+          <button class="btn btn-primary btn-sm" id="createTeamETBtn">+ Create</button>
+        </div>
+        <div class="team-et-list" id="teamEventTypes">
+          <div class="empty-state">
+            <p>No team event types yet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Org Modal -->
+  <div class="modal-overlay" id="createOrgModal">
+    <div class="modal">
+      <h3>Create Team</h3>
+      <div class="form-group">
+        <label for="newOrgName">Team Name</label>
+        <input type="text" id="newOrgName" placeholder="e.g. Sales Team">
+      </div>
+      <div class="form-group">
+        <label for="newOrgSlug">URL Slug</label>
+        <input type="text" id="newOrgSlug" placeholder="e.g. sales-team">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelCreateOrg">Cancel</button>
+        <button class="btn btn-primary" id="submitCreateOrg">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Invite Member Modal -->
+  <div class="modal-overlay" id="inviteMemberModal">
+    <div class="modal">
+      <h3>Invite Member</h3>
+      <div class="form-group">
+        <label for="inviteEmail">Email Address</label>
+        <input type="email" id="inviteEmail" placeholder="colleague@company.com">
+      </div>
+      <div class="form-group">
+        <label for="inviteRole">Role</label>
+        <select id="inviteRole">
+          <option value="member">Member</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelInvite">Cancel</button>
+        <button class="btn btn-primary" id="submitInvite">Send Invite</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Team Event Type Modal -->
+  <div class="modal-overlay" id="createTeamETModal">
+    <div class="modal">
+      <h3>Create Team Event Type</h3>
+      <div class="form-group">
+        <label for="teamETName">Name</label>
+        <input type="text" id="teamETName" placeholder="e.g. Sales Demo">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="teamETDuration">Duration (minutes)</label>
+          <input type="number" id="teamETDuration" value="30" min="5" max="720">
+        </div>
+        <div class="form-group">
+          <label for="teamETMode">Scheduling Mode</label>
+          <select id="teamETMode">
+            <option value="round-robin">Round Robin</option>
+            <option value="collective">Collective</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="teamETDescription">Description</label>
+        <input type="text" id="teamETDescription" placeholder="Brief description">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelCreateTeamET">Cancel</button>
+        <button class="btn btn-primary" id="submitCreateTeamET">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Org Modal -->
+  <div class="modal-overlay" id="editOrgModal">
+    <div class="modal">
+      <h3>Edit Team</h3>
+      <div class="form-group">
+        <label for="editOrgName">Team Name</label>
+        <input type="text" id="editOrgName">
+      </div>
+      <div class="form-group">
+        <label for="editOrgLogo">Logo URL</label>
+        <input type="text" id="editOrgLogo" placeholder="https://...">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelEditOrg">Cancel</button>
+        <button class="btn btn-primary" id="submitEditOrg">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ============================================================
+    // State
+    // ============================================================
+    let currentUser = null;
+    let orgs = [];
+    let currentOrg = null;
+
+    // ============================================================
+    // Init
+    // ============================================================
+    (async function init() {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.status === 401) {
+          window.location.href = '/auth/login.html';
+          return;
+        }
+        currentUser = await res.json();
+        await loadOrgs();
+      } catch (err) {
+        console.error('Init error:', err);
+      }
+    })();
+
+    // ============================================================
+    // API helpers
+    // ============================================================
+    async function api(method, path, body) {
+      const opts = { method, headers: { 'Content-Type': 'application/json' } };
+      if (body) opts.body = JSON.stringify(body);
+      const res = await fetch(path, opts);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Request failed');
+      return data;
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('visible');
+      setTimeout(() => t.classList.remove('visible'), 3000);
+    }
+
+    // ============================================================
+    // Load organizations
+    // ============================================================
+    async function loadOrgs() {
+      try {
+        orgs = await api('GET', '/api/organizations');
+        renderOrgList();
+      } catch (err) {
+        console.error('Failed to load orgs:', err);
+      }
+    }
+
+    function renderOrgList() {
+      const container = document.getElementById('orgList');
+      const noMsg = document.getElementById('noOrgsMessage');
+
+      if (orgs.length === 0) {
+        container.innerHTML = '';
+        container.appendChild(noMsg);
+        noMsg.style.display = 'block';
+        return;
+      }
+
+      noMsg.style.display = 'none';
+      container.innerHTML = orgs.map(org => `
+        <div class="org-card" data-org-id="${org.id}">
+          <div class="org-card-name">${esc(org.name)}</div>
+          <div class="org-card-slug">/${esc(org.slug)}</div>
+          <div class="org-card-role">${esc(org.my_role)}</div>
+        </div>
+      `).join('');
+
+      container.querySelectorAll('.org-card').forEach(card => {
+        card.addEventListener('click', () => openOrg(parseInt(card.dataset.orgId)));
+      });
+    }
+
+    // ============================================================
+    // Open organization detail
+    // ============================================================
+    async function openOrg(orgId) {
+      try {
+        currentOrg = await api('GET', `/api/organizations/${orgId}`);
+        document.getElementById('orgListView').style.display = 'none';
+        document.getElementById('orgDetailView').style.display = 'block';
+        renderOrgDetail();
+      } catch (err) {
+        showToast('Failed to load team: ' + err.message);
+      }
+    }
+
+    function renderOrgDetail() {
+      document.getElementById('orgName').textContent = currentOrg.name;
+
+      // Only show edit/invite for admin/owner
+      const isAdminOrOwner = currentOrg.my_role === 'owner' || currentOrg.my_role === 'admin';
+      document.getElementById('editOrgBtn').style.display = isAdminOrOwner ? '' : 'none';
+      document.getElementById('inviteMemberBtn').style.display = isAdminOrOwner ? '' : 'none';
+      document.getElementById('createTeamETBtn').style.display = isAdminOrOwner ? '' : 'none';
+
+      // Stats
+      const totalMembers = currentOrg.members.length;
+      const totalBookings = currentOrg.members.reduce((sum, m) => sum + (m.booking_count_30d || 0), 0);
+      const totalEventTypes = (currentOrg.event_types || []).length;
+      document.getElementById('orgStats').innerHTML = `
+        <div class="stat-item">
+          <div class="stat-value">${totalMembers}</div>
+          <div class="stat-label">Members</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">${totalBookings}</div>
+          <div class="stat-label">Bookings (30d)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">${totalEventTypes}</div>
+          <div class="stat-label">Event Types</div>
+        </div>
+      `;
+
+      // Members table
+      const tbody = document.getElementById('membersTableBody');
+      tbody.innerHTML = currentOrg.members.map(m => `
+        <tr>
+          <td>
+            <div class="member-name">${esc(m.name)}</div>
+            <div class="member-email">${esc(m.email)}</div>
+          </td>
+          <td><span class="role-badge role-${m.role}">${esc(m.role)}</span></td>
+          <td>${m.booking_count_30d || 0}</td>
+          <td>
+            ${currentOrg.my_role === 'owner' && m.role !== 'owner' ? `
+              <button class="btn btn-secondary btn-sm" onclick="changeRole(${m.user_id}, '${m.role === 'admin' ? 'member' : 'admin'}')">
+                Make ${m.role === 'admin' ? 'Member' : 'Admin'}
+              </button>
+            ` : ''}
+            ${isAdminOrOwner && m.role !== 'owner' ? `
+              <button class="btn btn-danger btn-sm" onclick="removeMember(${m.user_id})">Remove</button>
+            ` : ''}
+          </td>
+        </tr>
+      `).join('');
+
+      // Pending invitations
+      const invites = currentOrg.invitations || [];
+      const invitesContainer = document.getElementById('pendingInvites');
+      const invitesList = document.getElementById('pendingInvitesList');
+      if (invites.length > 0) {
+        invitesContainer.style.display = 'block';
+        invitesList.innerHTML = invites.map(inv => `
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--gray-100);">
+            <span style="font-size:14px;">${esc(inv.email)} <span class="role-badge role-${inv.role}">${esc(inv.role)}</span></span>
+          </div>
+        `).join('');
+      } else {
+        invitesContainer.style.display = 'none';
+      }
+
+      // Team event types
+      const etContainer = document.getElementById('teamEventTypes');
+      const eventTypes = currentOrg.event_types || [];
+      if (eventTypes.length === 0) {
+        etContainer.innerHTML = '<div class="empty-state"><p>No team event types yet.</p></div>';
+      } else {
+        etContainer.innerHTML = eventTypes.map(et => `
+          <div class="team-et-card">
+            <div class="team-et-info">
+              <div class="team-et-name">${esc(et.name)}</div>
+              <div class="team-et-meta">${et.duration_minutes} min &middot; ${esc(et.slug)}</div>
+            </div>
+            <span class="mode-badge">${esc(et.round_robin_mode || 'personal')}</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    // ============================================================
+    // Actions
+    // ============================================================
+    async function removeMember(userId) {
+      if (!confirm('Remove this member from the team?')) return;
+      try {
+        await api('DELETE', `/api/organizations/${currentOrg.id}/members/${userId}`);
+        showToast('Member removed');
+        await openOrg(currentOrg.id);
+      } catch (err) {
+        showToast('Error: ' + err.message);
+      }
+    }
+
+    async function changeRole(userId, newRole) {
+      try {
+        await api('PUT', `/api/organizations/${currentOrg.id}/members/${userId}`, { role: newRole });
+        showToast('Role updated');
+        await openOrg(currentOrg.id);
+      } catch (err) {
+        showToast('Error: ' + err.message);
+      }
+    }
+
+    // ============================================================
+    // Modal handlers
+    // ============================================================
+
+    // Create org
+    document.getElementById('createOrgBtn').addEventListener('click', () => {
+      document.getElementById('createOrgModal').classList.add('visible');
+    });
+    document.getElementById('createOrgBtn2').addEventListener('click', () => {
+      document.getElementById('createOrgModal').classList.add('visible');
+    });
+    document.getElementById('cancelCreateOrg').addEventListener('click', () => {
+      document.getElementById('createOrgModal').classList.remove('visible');
+    });
+    document.getElementById('submitCreateOrg').addEventListener('click', async () => {
+      const name = document.getElementById('newOrgName').value.trim();
+      const slug = document.getElementById('newOrgSlug').value.trim();
+      if (!name) return showToast('Name is required');
+      try {
+        await api('POST', '/api/organizations', { name, slug: slug || undefined });
+        document.getElementById('createOrgModal').classList.remove('visible');
+        document.getElementById('newOrgName').value = '';
+        document.getElementById('newOrgSlug').value = '';
+        showToast('Team created');
+        await loadOrgs();
+      } catch (err) {
+        showToast('Error: ' + err.message);
+      }
+    });
+
+    // Auto-generate slug from name
+    document.getElementById('newOrgName').addEventListener('input', (e) => {
+      const slugInput = document.getElementById('newOrgSlug');
+      if (!slugInput.dataset.manual) {
+        slugInput.value = e.target.value.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+      }
+    });
+    document.getElementById('newOrgSlug').addEventListener('input', function() {
+      this.dataset.manual = 'true';
+    });
+
+    // Invite member
+    document.getElementById('inviteMemberBtn').addEventListener('click', () => {
+      document.getElementById('inviteMemberModal').classList.add('visible');
+    });
+    document.getElementById('cancelInvite').addEventListener('click', () => {
+      document.getElementById('inviteMemberModal').classList.remove('visible');
+    });
+    document.getElementById('submitInvite').addEventListener('click', async () => {
+      const email = document.getElementById('inviteEmail').value.trim();
+      const role = document.getElementById('inviteRole').value;
+      if (!email) return showToast('Email is required');
+      try {
+        const result = await api('POST', `/api/organizations/${currentOrg.id}/invite`, { email, role });
+        document.getElementById('inviteMemberModal').classList.remove('visible');
+        document.getElementById('inviteEmail').value = '';
+        showToast(result.status === 'added' ? 'Member added' : 'Invitation sent');
+        await openOrg(currentOrg.id);
+      } catch (err) {
+        showToast('Error: ' + err.message);
+      }
+    });
+
+    // Create team event type
+    document.getElementById('createTeamETBtn').addEventListener('click', () => {
+      document.getElementById('createTeamETModal').classList.add('visible');
+    });
+    document.getElementById('cancelCreateTeamET').addEventListener('click', () => {
+      document.getElementById('createTeamETModal').classList.remove('visible');
+    });
+    document.getElementById('submitCreateTeamET').addEventListener('click', async () => {
+      const name = document.getElementById('teamETName').value.trim();
+      const duration = parseInt(document.getElementById('teamETDuration').value);
+      const mode = document.getElementById('teamETMode').value;
+      const description = document.getElementById('teamETDescription').value.trim();
+      if (!name) return showToast('Name is required');
+      try {
+        await api('POST', '/api/event-types', {
+          name,
+          duration_minutes: duration,
+          description: description || undefined,
+          org_id: currentOrg.id,
+          round_robin_mode: mode,
+        });
+        document.getElementById('createTeamETModal').classList.remove('visible');
+        document.getElementById('teamETName').value = '';
+        document.getElementById('teamETDescription').value = '';
+        showToast('Team event type created');
+        await openOrg(currentOrg.id);
+      } catch (err) {
+        showToast('Error: ' + err.message);
+      }
+    });
+
+    // Edit org
+    document.getElementById('editOrgBtn').addEventListener('click', () => {
+      document.getElementById('editOrgName').value = currentOrg.name;
+      document.getElementById('editOrgLogo').value = currentOrg.logo_url || '';
+      document.getElementById('editOrgModal').classList.add('visible');
+    });
+    document.getElementById('cancelEditOrg').addEventListener('click', () => {
+      document.getElementById('editOrgModal').classList.remove('visible');
+    });
+    document.getElementById('submitEditOrg').addEventListener('click', async () => {
+      const name = document.getElementById('editOrgName').value.trim();
+      const logo_url = document.getElementById('editOrgLogo').value.trim() || null;
+      if (!name) return showToast('Name is required');
+      try {
+        await api('PUT', `/api/organizations/${currentOrg.id}`, { name, logo_url });
+        document.getElementById('editOrgModal').classList.remove('visible');
+        showToast('Team updated');
+        await openOrg(currentOrg.id);
+      } catch (err) {
+        showToast('Error: ' + err.message);
+      }
+    });
+
+    // Back to org list
+    document.getElementById('backToOrgsLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('orgDetailView').style.display = 'none';
+      document.getElementById('orgListView').style.display = 'block';
+      currentOrg = null;
+    });
+
+    // Close modals on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) overlay.classList.remove('visible');
+      });
+    });
+
+    // ============================================================
+    // Utilities
+    // ============================================================
+    function esc(str) {
+      // Must escape quotes too: values land inside attributes (href="...", alt="...").
+      if (str == null) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+  </script>
+</body>
+</html>

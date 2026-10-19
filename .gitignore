@@ -1,0 +1,13 @@
+node_modules/
+.wrangler/
+.dev.vars
+.env
+.env.local
+dist/
+.DS_Store
+*.log
+coverage/
+.claude/worktrees/
+playwright-report/
+test-results/
+SECURITY-FINDINGS.md

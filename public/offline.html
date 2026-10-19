@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2563eb">
+  <title>You're offline · Calendo</title>
+  <style>
+    :root { --blue: #2563eb; --ink: #0f172a; --muted: #64748b; --border: #e2e8f0; }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; background: #fff; color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex; align-items: center; justify-content: center; padding: 24px; line-height: 1.5;
+    }
+    .card { max-width: 420px; width: 100%; text-align: center; }
+    .logo {
+      width: 72px; height: 72px; margin: 0 auto 20px; border-radius: 18px; background: #eff6ff;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo svg { width: 40px; height: 40px; }
+    h1 { font-size: 1.5rem; margin: 0 0 10px; }
+    p { color: var(--muted); margin: 0 0 24px; font-size: 1rem; }
+    button {
+      appearance: none; border: none; cursor: pointer; font: inherit; font-weight: 600;
+      background: var(--blue); color: #fff; padding: 12px 28px; border-radius: 10px; font-size: 1rem;
+    }
+    button:active { transform: translateY(1px); }
+    .hint { margin-top: 18px; font-size: .85rem; color: var(--muted); }
+  </style>
+  <!-- pwa-head -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Calendo">
+  <script src="/pwa.js" defer></script>
+</head>
+<body>
+  <div class="card">
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+    </div>
+    <h1>You're offline</h1>
+    <p>Calendo needs an internet connection to load your schedule and availability. Check your connection and try again.</p>
+    <button type="button" onclick="retry()">Try again</button>
+    <div class="hint">Your data is safe — nothing was lost.</div>
+  </div>
+  <script>
+    // Reload once — guard against the manual button and the 'online' event both firing.
+    var reloading = false;
+    function retry() { if (reloading) return; reloading = true; location.reload(); }
+    // Auto-recover: when the network returns, reload to the page the user wanted.
+    window.addEventListener('online', retry);
+  </script>
+</body>
+</html>

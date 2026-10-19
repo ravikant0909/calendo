@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team | Calendo</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --brand: #0069ff;
+      --brand-light: #e8f0fe;
+      --text: #1a1a1a;
+      --text-secondary: #555;
+      --text-muted: #888;
+      --border: #e0e0e0;
+      --bg: #ffffff;
+      --bg-page: #f7f8fa;
+      --bg-hover: #f5f5f5;
+      --radius: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-lg: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-page);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .team-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* Loading skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s infinite;
+      border-radius: var(--radius);
+    }
+
+    @keyframes skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .skeleton-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 40px;
+    }
+
+    .skeleton-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+    }
+
+    .skeleton-line {
+      height: 20px;
+      width: 200px;
+    }
+
+    .skeleton-card {
+      height: 100px;
+      margin-bottom: 16px;
+    }
+
+    /* Team header */
+    .team-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .team-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--bg);
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .team-logo-placeholder {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--brand);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0 auto 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .team-name {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .team-subtitle {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    /* Member card */
+    .member-card {
+      background: var(--bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .member-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .member-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .member-avatar-placeholder {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--brand-light);
+      color: var(--brand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .member-name {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .member-events {
+      padding: 8px 0;
+    }
+
+    .event-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      text-decoration: none;
+      color: var(--text);
+      transition: background 0.15s;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .event-link:last-child {
+      border-bottom: none;
+    }
+
+    .event-link:hover {
+      background: var(--bg-hover);
+    }
+
+    .event-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .event-name {
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .event-meta {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .event-color {
+      width: 4px;
+      height: 36px;
+      border-radius: 2px;
+      flex-shrink: 0;
+      margin-right: 4px;
+    }
+
+    .event-arrow {
+      color: var(--text-muted);
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-left: 12px;
+    }
+
+    .no-events {
+      padding: 16px 24px;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-style: italic;
+    }
+
+    /* Error state */
+    .error-container {
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    .error-container h2 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .error-container p {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    /* Powered by */
+    .powered-by {
+      text-align: center;
+      margin-top: 40px;
+      padding: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .powered-by a {
+      color: var(--brand);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .powered-by a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 640px) {
+      .team-container {
+        padding: 24px 16px;
+      }
+
+      .team-name {
+        font-size: 22px;
+      }
+
+      .member-header {
+        padding: 16px;
+      }
+
+      .event-link {
+        padding: 12px 16px;
+      }
+    }
+  </style>
+  <!-- pwa-head -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Calendo">
+  <script src="/pwa.js" defer></script>
+</head>
+<body>
+  <div class="team-container">
+    <!-- Loading skeleton -->
+    <div id="loadingSkeleton">
+      <div class="skeleton-header">
+        <div class="skeleton skeleton-circle"></div>
+        <div class="skeleton skeleton-line"></div>
+      </div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+    </div>
+
+    <!-- Error state -->
+    <div id="errorState" style="display:none">
+      <div class="error-container">
+        <h2>Team not found</h2>
+        <p>The team page you're looking for doesn't exist or has been removed.</p>
+      </div>
+    </div>
+
+    <!-- Team content -->
+    <div id="teamContent" style="display:none">
+      <div class="team-header" id="teamHeader"></div>
+      <div id="membersList"></div>
+      <div class="powered-by">
+        Powered by <a href="/">Calendo</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function loadTeamPage() {
+      const params = new URLSearchParams(window.location.search);
+      const orgSlug = params.get('org');
+
+      if (!orgSlug) {
+        showError();
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/public/team/${encodeURIComponent(orgSlug)}`);
+        if (!res.ok) {
+          showError();
+          return;
+        }
+
+        const data = await res.json();
+        renderTeam(data);
+      } catch (err) {
+        console.error('Failed to load team page:', err);
+        showError();
+      }
+    }
+
+    function showError() {
+      document.getElementById('loadingSkeleton').style.display = 'none';
+      document.getElementById('errorState').style.display = '';
+    }
+
+    function renderTeam(data) {
+      const { org, members } = data;
+
+      // Update page title
+      document.title = `${org.name} | Calendo`;
+
+      // Render header
+      const header = document.getElementById('teamHeader');
+      let logoHtml;
+      if (org.logo_url) {
+        logoHtml = `<img src="${escapeHtml(org.logo_url)}" alt="${escapeHtml(org.name)}" class="team-logo">`;
+      } else {
+        const initial = org.name.charAt(0).toUpperCase();
+        logoHtml = `<div class="team-logo-placeholder">${initial}</div>`;
+      }
+      header.innerHTML = `
+        ${logoHtml}
+        <h1 class="team-name">${escapeHtml(org.name)}</h1>
+        <p class="team-subtitle">Choose a team member to schedule a meeting</p>
+      `;
+
+      // Render members
+      const list = document.getElementById('membersList');
+      if (!members || members.length === 0) {
+        list.innerHTML = '<div class="error-container"><p>No team members available for booking.</p></div>';
+      } else {
+        list.innerHTML = members.map(member => {
+          const initial = (member.name || '?').charAt(0).toUpperCase();
+          const avatarHtml = member.avatar_url
+            ? `<img src="${escapeHtml(member.avatar_url)}" alt="${escapeHtml(member.name)}" class="member-avatar">`
+            : `<div class="member-avatar-placeholder">${initial}</div>`;
+
+          let eventsHtml;
+          if (!member.event_types || member.event_types.length === 0) {
+            eventsHtml = '<div class="no-events">No event types available</div>';
+          } else {
+            eventsHtml = member.event_types.map(et => {
+              const bookingUrl = member.booking_slug
+                ? `/booking/${encodeURIComponent(member.booking_slug)}?event=${encodeURIComponent(et.slug)}`
+                : '#';
+              const durationText = et.duration_minutes ? `${et.duration_minutes} min` : '';
+              const priceText = et.price_cents ? ` - ${formatPrice(et.price_cents, et.currency)}` : '';
+              return `
+                <a href="${bookingUrl}" class="event-link">
+                  <div class="event-color" style="background:${escapeHtml(et.color || '#0069ff')}"></div>
+                  <div class="event-info">
+                    <div class="event-name">${escapeHtml(et.name)}</div>
+                    <div class="event-meta">
+                      <span>${durationText}${priceText}</span>
+                      ${et.description ? `<span>${escapeHtml(truncate(et.description, 60))}</span>` : ''}
+                    </div>
+                  </div>
+                  <span class="event-arrow">&rsaquo;</span>
+                </a>
+              `;
+            }).join('');
+          }
+
+          return `
+            <div class="member-card">
+              <div class="member-header">
+                ${avatarHtml}
+                <div class="member-name">${escapeHtml(member.name)}</div>
+              </div>
+              <div class="member-events">
+                ${eventsHtml}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Show content
+      document.getElementById('loadingSkeleton').style.display = 'none';
+      document.getElementById('teamContent').style.display = '';
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function truncate(str, max) {
+      if (!str || str.length <= max) return str;
+      return str.slice(0, max) + '...';
+    }
+
+    function formatPrice(cents, currency) {
+      const amount = (cents / 100).toFixed(2);
+      const sym = currency === 'usd' ? '$' : currency === 'eur' ? '\u20AC' : currency === 'gbp' ? '\u00A3' : '';
+      return `${sym}${amount}`;
+    }
+
+    loadTeamPage();
+  </script>
+</body>
+</html>
