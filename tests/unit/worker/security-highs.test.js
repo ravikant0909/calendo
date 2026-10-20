@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { EMAIL_RE } from '../../../src/validation.js';
 
 // Regression tests for the 4 HIGH findings in the July 2026 security review:
 //  H1 OAuth login matched accounts by email alone (account takeover)
@@ -112,9 +113,9 @@ describe('H2 stored XSS — quote-unsafe escapers and permissive email regex', (
   const payload = 'a"onmouseover=alert(1);x="@evil.co';
 
   it('EMAIL_RE rejects the attribute-breakout payload but accepts real addresses', () => {
-    expect(worker.EMAIL_RE.test(payload)).toBe(false);
-    expect(worker.EMAIL_RE.test('x<script>@a.co')).toBe(false);
-    for (const ok of ['a@b.co', "o'brien@x.com", 'a.b+tag@gmail.com']) expect(worker.EMAIL_RE.test(ok)).toBe(true);
+    expect(EMAIL_RE.test(payload)).toBe(false);
+    expect(EMAIL_RE.test('x<script>@a.co')).toBe(false);
+    for (const ok of ['a@b.co', "o'brien@x.com", 'a.b+tag@gmail.com']) expect(EMAIL_RE.test(ok)).toBe(true);
   });
 
   // Every public page's escaper must neutralise quotes.

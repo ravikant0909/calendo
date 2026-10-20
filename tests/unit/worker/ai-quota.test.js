@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
-import { AI_MODEL, AI_LIMITS, consumeAIQuota } from '../../../src/worker.js';
+import { consumeAIQuota } from '../../../src/worker.js';
+import { AI_MODEL, AI_LIMITS } from '../../../src/ai-limits.js';
 
 // Minimal D1-shaped wrapper over a real SQLite engine, so the upsert SQL itself
 // is exercised (not a regex mock).
@@ -22,6 +23,15 @@ function d1() {
 }
 
 const src = readFileSync(new URL('../../../src/worker.js', import.meta.url), 'utf8');
+
+describe('worker entry module', () => {
+  // Cloudflare treats every export of the main module as an entry point; a
+  // non-function export (string, object, regex) stops the runtime from booting.
+  // Unit tests can't see that, so guard it here.
+  it('exports only functions and the default handler', () => {
+    expect(src).not.toMatch(/^export (const|let|var) /m);
+  });
+});
 
 describe('AI model', () => {
   it('every Claude call uses AI_MODEL = claude-haiku-5-5', () => {

@@ -16,15 +16,12 @@ import {
   sendEmail,
 } from './email.js';
 import { sendSMS } from './sms.js';
+import { EMAIL_RE } from './validation.js';
+import { AI_MODEL, AI_LIMITS } from './ai-limits.js';
 
 // Top-level path segments reserved for the app/system. A booking-page slug can
 // never be one of these, so the pretty /<username> route never shadows a real
 // page and a host can never claim a system URL.
-// Plain email check. Also rejects characters that are legal in exotic quoted
-// addresses but have no real-world use and are classic HTML-injection payloads
-// (" < > ` \ and brackets/parens/commas/semicolons/colons).
-export const EMAIL_RE = /^[^\s@"<>`\\()\[\],;:]+@[^\s@"<>`\\()\[\],;:]+\.[^\s@"<>`\\()\[\],;:]+$/;
-
 const RESERVED_PATHS = new Set([
   'api', 'auth', 'booking', 'dashboard', 'admin', 'team', 'poll', 'routing',
   'onboarding', 'docs', 'embed', 'privacy', 'terms', 'pricing', 'about', 'blog',
@@ -9525,14 +9522,6 @@ export function classifyAiError(err) {
   }
   return 'Sorry, something went wrong with the AI assistant. Please try again.';
 }
-
-// One model for every AI call. Haiku 5.5 keeps the free tier cheap.
-export const AI_MODEL = 'claude-haiku-5-5';
-
-// Free daily AI allowance (UTC day). Users with their own Anthropic key or Pro
-// are unlimited. Override per deployment with AI_FREE_DAILY_LIMIT /
-// AI_PUBLIC_DAILY_LIMIT (self-hosters may set a high number).
-export const AI_LIMITS = { dashboard: 30, public: 50 };
 
 function aiDailyLimit(env, kind) {
   const raw = kind === 'public' ? env.AI_PUBLIC_DAILY_LIMIT : env.AI_FREE_DAILY_LIMIT;
