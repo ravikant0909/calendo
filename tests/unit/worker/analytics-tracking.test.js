@@ -33,7 +33,7 @@ function createMockDB(options = {}) {
                 return user ? { ...user, user_id: user.id } : null;
               }
               // Booking page by slug (public)
-              if (sql.includes('SELECT bp.*, u.name, u.avatar_url') && sql.includes('booking_pages bp')) {
+              if (sql.includes('u.name, u.avatar_url') && sql.includes('booking_pages bp')) {
                 const page = bookingPages.find(bp => bp.slug === args[0]);
                 if (!page) return null;
                 const user = users.find(u => u.id === page.user_id);

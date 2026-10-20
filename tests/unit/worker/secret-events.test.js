@@ -61,7 +61,7 @@ function createMockDB() {
                 return tables.availability_schedules.find(s => s.user_id === args[0] && s.is_default) || null;
               }
               // Booking page with user info (public)
-              if (sql.includes('SELECT bp.*, u.name, u.avatar_url') && sql.includes('booking_pages')) {
+              if (sql.includes('u.name, u.avatar_url') && sql.includes('booking_pages')) {
                 const page = tables.booking_pages.find(p => p.slug === args[0]);
                 if (!page) return null;
                 const user = tables.users.find(u => u.id === page.user_id);

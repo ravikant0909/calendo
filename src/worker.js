@@ -3684,22 +3684,34 @@ async function handleSlotDebug(request, env, url, path, user) {
   });
 }
 
+// Fields of a booking page that are safe to show to anyone. Host-only fields
+// (blocked_emails, custom_domain, user_id, timestamps) must never be added here.
+const PUBLIC_BOOKING_PAGE_FIELDS = [
+  'slug', 'display_name', 'bio', 'brand_color', 'custom_css', 'welcome_message',
+  'logo_url', 'hide_branding', 'cancellation_policy', 'ga_measurement_id', 'meta_pixel_id',
+  'name', 'avatar_url',
+];
+
 async function handleGetBookingPage(request, env, path) {
   const username = path.replace('/api/booking-page/', '');
-  const page = await env.DB.prepare(
-    `SELECT bp.*, u.name, u.avatar_url
+  const row = await env.DB.prepare(
+    `SELECT bp.user_id, bp.slug, bp.display_name, bp.bio, bp.brand_color, bp.custom_css,
+            bp.welcome_message, bp.logo_url, bp.hide_branding, bp.cancellation_policy,
+            bp.ga_measurement_id, bp.meta_pixel_id, u.name, u.avatar_url
      FROM booking_pages bp
      JOIN users u ON bp.user_id = u.id
      WHERE bp.slug = ?`
   ).bind(username).first();
-  if (!page) return jsonResponse({ error: 'Not found' }, 404);
+  if (!row) return jsonResponse({ error: 'Not found' }, 404);
+  const page = {};
+  for (const k of PUBLIC_BOOKING_PAGE_FIELDS) page[k] = row[k] ?? null;
 
   const eventTypes = await env.DB.prepare(
     `SELECT id, name, slug, description, duration_minutes, color, location_type, location_config, questions, locked_timezone, price_cents, currency, payment_method, redirect_url, allow_guests, group_max_attendees, reminder_settings
      FROM event_types
      WHERE user_id = ? AND is_active = 1 AND is_secret = 0
      ORDER BY sort_order ASC, created_at ASC`
-  ).bind(page.user_id).all();
+  ).bind(row.user_id).all();
 
   const results = eventTypes.results || [];
 
@@ -3711,7 +3723,7 @@ async function handleGetBookingPage(request, env, path) {
       `SELECT id, name, slug, description, duration_minutes, color, location_type, location_config, questions, locked_timezone, price_cents, currency, payment_method, redirect_url, allow_guests, group_max_attendees, reminder_settings
        FROM event_types
        WHERE user_id = ? AND slug = ? AND is_active = 1 AND is_secret = 1`
-    ).bind(page.user_id, eventSlug).first();
+    ).bind(row.user_id, eventSlug).first();
     if (secretEvent) {
       results.push(secretEvent);
     }

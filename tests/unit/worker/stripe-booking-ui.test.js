@@ -664,7 +664,7 @@ describe('Booking Page Data - Price Exposure', () => {
           bind(...args) {
             return {
               async first() {
-                if (sql.includes('SELECT bp.*, u.name, u.avatar_url') && sql.includes('booking_pages')) {
+                if (sql.includes('u.name, u.avatar_url') && sql.includes('booking_pages')) {
                   return { user_id: 1, slug: 'testuser', display_name: 'Test User', name: 'Test User', avatar_url: null };
                 }
                 if (sql.includes('FROM event_types') && sql.includes('is_secret = 1')) return null;
