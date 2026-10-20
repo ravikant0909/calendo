@@ -127,6 +127,6 @@ describe('demo booking page', () => {
       expect(over.limit_reached).toBe(true);
       const other = await (await call('/api/ai/chat', { booking_page_slug: 'demo', message: 'hi' }, '8.8.8.8')).json();
       expect(other.limit_reached).toBeUndefined();
-    });
+    }, 30000); // ~30 real chat round trips; slow on CI runners
   });
 });
