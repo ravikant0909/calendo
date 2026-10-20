@@ -43,3 +43,8 @@ STRIPE_PRO_PRICE_ID=
 TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=
 TWILIO_PHONE_NUMBER=
+
+# --- AI limits (optional). Free daily messages per user for users without their
+# own key or Pro. Defaults: 30 (dashboard agent), 50 (invitee chat, per host). ---
+# AI_FREE_DAILY_LIMIT=30
+# AI_PUBLIC_DAILY_LIMIT=50

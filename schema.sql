@@ -455,6 +455,16 @@ CREATE TABLE IF NOT EXISTS oauth_identities (
 
 CREATE INDEX IF NOT EXISTS idx_oauth_identities_user ON oauth_identities(user_id);
 
+-- Daily AI message counter (see migrations/0033_ai_usage.sql).
+CREATE TABLE IF NOT EXISTS ai_usage (
+    user_id INTEGER NOT NULL,
+    day TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    count INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (user_id, day, kind),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 -- ============================================
 -- WEBHOOKS
 -- ============================================

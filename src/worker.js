@@ -1029,6 +1029,7 @@ async function deleteAllUserData(env, userId) {
     stmt('DELETE FROM calendar_connections WHERE user_id = ?'),
     stmt('DELETE FROM zoom_connections WHERE user_id = ?'),
     stmt('DELETE FROM oauth_identities WHERE user_id = ?'),
+    stmt('DELETE FROM ai_usage WHERE user_id = ?'),
     stmt('DELETE FROM webhooks WHERE user_id = ?'),
     stmt('DELETE FROM api_keys WHERE user_id = ?'),
     stmt('DELETE FROM coupons WHERE user_id = ?'),
@@ -6665,7 +6666,18 @@ RULES:
   try {
     const chatMessages = messages.slice(-10).map(m => ({ role: m.role, content: m.content }));
 
-    // Use Claude API (Sonnet 4.6)
+    const hostAI = await hasOwnAIKey(env, page.user_id);
+    if (!hostAI.ownKey && !hostAI.pro) {
+      const quota = await consumeAIQuota(env, page.user_id, 'public');
+      if (!quota.allowed) {
+        return jsonResponse({
+          session_id: chatSessionId,
+          message: `The AI assistant is resting for today. You can still pick a time with ${page.host_name} using the calendar on this page.`,
+          limit_reached: true,
+        });
+      }
+    }
+
     const bookingAiKey = await getAIApiKey(env, page.user_id);
     const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -6675,8 +6687,11 @@ RULES:
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 400,
+        model: AI_MODEL,
+        // Haiku 5.5 thinks by default and thinking counts toward max_tokens:
+        // leave room for it, and keep effort low for a short chat reply.
+        max_tokens: 2048,
+        output_config: { effort: 'low' },
         system: systemPrompt,
         messages: chatMessages,
       }),
@@ -6694,7 +6709,9 @@ RULES:
       responseText = aiResponse.response || 'I\'m sorry, I couldn\'t process that. Could you try again?';
     } else {
       const claudeData = await claudeResponse.json();
-      responseText = claudeData.content?.[0]?.text || 'I\'m sorry, I couldn\'t process that. Could you try again?';
+      // The response can start with a thinking block, so find the text.
+      responseText = (claudeData.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n').trim()
+        || 'I\'m sorry, I couldn\'t process that. Could you try again?';
     }
 
     // Strip any JSON fragments
@@ -9509,6 +9526,39 @@ export function classifyAiError(err) {
   return 'Sorry, something went wrong with the AI assistant. Please try again.';
 }
 
+// One model for every AI call. Haiku 5.5 keeps the free tier cheap.
+export const AI_MODEL = 'claude-haiku-5-5';
+
+// Free daily AI allowance (UTC day). Users with their own Anthropic key or Pro
+// are unlimited. Override per deployment with AI_FREE_DAILY_LIMIT /
+// AI_PUBLIC_DAILY_LIMIT (self-hosters may set a high number).
+export const AI_LIMITS = { dashboard: 30, public: 50 };
+
+function aiDailyLimit(env, kind) {
+  const raw = kind === 'public' ? env.AI_PUBLIC_DAILY_LIMIT : env.AI_FREE_DAILY_LIMIT;
+  const n = parseInt(raw, 10);
+  return Number.isFinite(n) && n >= 0 ? n : AI_LIMITS[kind];
+}
+
+// Count one AI message for this user and say whether it's within the allowance.
+// Atomic upsert, so concurrent requests can't both slip under the limit.
+export async function consumeAIQuota(env, userId, kind) {
+  const limit = aiDailyLimit(env, kind);
+  const day = new Date().toISOString().slice(0, 10);
+  const row = await env.DB.prepare(
+    `INSERT INTO ai_usage (user_id, day, kind, count) VALUES (?, ?, ?, 1)
+     ON CONFLICT (user_id, day, kind) DO UPDATE SET count = count + 1
+     RETURNING count`
+  ).bind(userId, day, kind).first();
+  const used = row?.count ?? 1;
+  return { allowed: used <= limit, used, limit };
+}
+
+async function hasOwnAIKey(env, userId) {
+  const row = await env.DB.prepare('SELECT ai_api_key_encrypted, plan FROM users WHERE id = ?').bind(userId).first();
+  return { ownKey: !!row?.ai_api_key_encrypted, pro: row?.plan === 'pro' };
+}
+
 async function getAIApiKey(env, userId) {
   // Check for user's own API key (BYOK)
   if (userId) {
@@ -9956,6 +10006,19 @@ async function handleDashboardAI(request, env, user) {
 
   const chatSessionId = session_id || crypto.randomUUID();
 
+  const own = await hasOwnAIKey(env, user.id);
+  if (!own.ownKey && !own.pro) {
+    const quota = await consumeAIQuota(env, user.id, 'dashboard');
+    if (!quota.allowed) {
+      return jsonResponse({
+        session_id: chatSessionId,
+        message: `You've used your ${quota.limit} free AI messages for today. They reset at midnight UTC. For unlimited messages, add your own Anthropic API key in Settings (still free) or upgrade to Pro ($2/mo). Everything also works from the dashboard without AI.`,
+        error: { code: 'AI_DAILY_LIMIT', message: 'Daily free AI limit reached' },
+        limit_reached: true,
+      }, 429);
+    }
+  }
+
   try {
   // Load user context in parallel
   const [eventTypesRes, bookingsRes, bookingPage, calendarsRes, schedulesRes, zoomConn] = await Promise.all([
@@ -10048,8 +10111,9 @@ ${userContext}
           'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 1024,
+          model: AI_MODEL,
+          max_tokens: 4096, // includes Haiku 5.5's thinking
+          output_config: { effort: 'medium' },
           system: systemPrompt,
           tools: DASHBOARD_TOOLS,
           messages: currentMessages,
