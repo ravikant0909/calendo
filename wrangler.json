@@ -26,6 +26,7 @@
   },
   "vars": {
     "APP_ORIGIN": "https://calendo.dev",
+    "DEMO_SLUGS": "demo",
     "TWILIO_ACCOUNT_SID": "",
     "TWILIO_AUTH_TOKEN": "",
     "TWILIO_PHONE_NUMBER": "",

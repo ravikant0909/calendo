@@ -17,7 +17,7 @@ import {
 } from './email.js';
 import { sendSMS } from './sms.js';
 import { EMAIL_RE } from './validation.js';
-import { AI_MODEL, AI_LIMITS } from './ai-limits.js';
+import { AI_MODEL, AI_LIMITS, DEMO_CHAT_PER_IP_HOURLY } from './ai-limits.js';
 
 // Top-level path segments reserved for the app/system. A booking-page slug can
 // never be one of these, so the pretty /<username> route never shadows a real
@@ -29,6 +29,14 @@ const RESERVED_PATHS = new Set([
   'settings', 'app', 'account', 's', 'www', 'assets', 'static', 'public', 'index',
 ]);
 function isReservedSlug(s) { return RESERVED_PATHS.has(String(s || '').toLowerCase()); }
+
+// Demo booking pages (env DEMO_SLUGS, comma-separated) let anyone try booking
+// and the AI chat without an account: bookings are validated but never saved,
+// and no emails or webhooks go out.
+export function isDemoSlug(env, slug) {
+  const list = String(env.DEMO_SLUGS || '').split(',').map(x => x.trim().toLowerCase()).filter(Boolean);
+  return list.includes(String(slug || '').toLowerCase());
+}
 
 export default {
   async fetch(request, env, ctx) {
@@ -2984,6 +2992,28 @@ async function handlePublicBooking(request, env, path) {
     }
   }
 
+  if (isDemoSlug(env, username)) {
+    // Everything above was validated for real; stop before anything is saved
+    // or sent. No uid/cancel token: there is nothing to manage afterwards.
+    return jsonResponse({
+      demo: true,
+      booking: {
+        uid: null,
+        event_name: eventType.name,
+        invitee_name: name.trim(),
+        invitee_email: email.trim(),
+        start_time: startTimeISO,
+        end_time: endTimeISO,
+        status: 'confirmed',
+        timezone: inviteeTz,
+        location: null,
+        cancel_token: null,
+        guest_emails: guestEmails,
+      },
+      redirect_url: null,
+    }, 201);
+  }
+
   const booking = await env.DB.prepare(
     `INSERT INTO bookings (event_type_id, uid, invitee_email, invitee_name, invitee_timezone, invitee_phone, start_time, end_time, status, answers, cancel_token, assigned_user_id, recurrence_rule, recurrence_end_date, guest_emails, utm_source, utm_medium, utm_campaign, utm_term, utm_content)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -3687,7 +3717,7 @@ async function handleGetBookingPage(request, env, path) {
     }
   }
 
-  return jsonResponse({ page, eventTypes: results });
+  return jsonResponse({ page, eventTypes: results, demo: isDemoSlug(env, username) });
 }
 
 async function handleGetPublicAvailability(request, env, url, path) {
@@ -6663,9 +6693,20 @@ RULES:
   try {
     const chatMessages = messages.slice(-10).map(m => ({ role: m.role, content: m.content }));
 
-    const hostAI = await hasOwnAIKey(env, page.user_id);
+    const isDemo = isDemoSlug(env, booking_page_slug);
+    if (isDemo && !(env.DISABLE_RATE_LIMITS === '1' || env.DISABLE_RATE_LIMITS === 'true')) {
+      const perIp = checkRateLimit(`demochat:${getClientIP(request)}`, DEMO_CHAT_PER_IP_HOURLY, 3600);
+      if (!perIp.allowed) {
+        return jsonResponse({
+          session_id: chatSessionId,
+          message: 'You have reached the demo chat limit for now. You can still pick a time using the calendar on this page.',
+          limit_reached: true,
+        });
+      }
+    }
+    const hostAI = isDemo ? { ownKey: false, pro: false } : await hasOwnAIKey(env, page.user_id);
     if (!hostAI.ownKey && !hostAI.pro) {
-      const quota = await consumeAIQuota(env, page.user_id, 'public');
+      const quota = await consumeAIQuota(env, page.user_id, isDemo ? 'demo' : 'public');
       if (!quota.allowed) {
         return jsonResponse({
           session_id: chatSessionId,
@@ -9524,7 +9565,9 @@ export function classifyAiError(err) {
 }
 
 function aiDailyLimit(env, kind) {
-  const raw = kind === 'public' ? env.AI_PUBLIC_DAILY_LIMIT : env.AI_FREE_DAILY_LIMIT;
+  const raw = kind === 'public' ? env.AI_PUBLIC_DAILY_LIMIT
+    : kind === 'demo' ? env.AI_DEMO_DAILY_LIMIT
+    : env.AI_FREE_DAILY_LIMIT;
   const n = parseInt(raw, 10);
   return Number.isFinite(n) && n >= 0 ? n : AI_LIMITS[kind];
 }
